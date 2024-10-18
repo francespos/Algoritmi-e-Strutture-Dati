@@ -115,7 +115,7 @@ int main() {
     l.remove(node2);
     std::cout << "Node 2 removed.\n";
     
-        std::cout << "List length: " << l.getLength() << "\n\n";
+    std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
     for (int i = 0; i < 2; ++i) {
