@@ -6,11 +6,21 @@ class Stack {
 public:
     Stack() noexcept : m_items{}, m_topPos(-1) {}
 
-    bool isEmpty() const noexcept { return m_topPos == -1; }
-    bool isFull() const noexcept { return m_topPos == N - 1; }
+    bool isEmpty() const noexcept {
+        return m_topPos == -1; 
+    }
     
-    int getLength() const noexcept { return m_topPos + 1; }
-    constexpr int getMaxLength() const noexcept { return N; }
+    bool isFull() const noexcept {
+        return m_topPos == N - 1;
+    }
+    
+    int getLength() const noexcept {
+        return m_topPos + 1;
+    }
+    
+    constexpr int getMaxLength() const noexcept {
+        return N;
+    }
     
     T& getTop() {
         if (isEmpty()) {
