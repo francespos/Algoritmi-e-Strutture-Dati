@@ -1,18 +1,18 @@
 #include <array>
 #include <iostream>
 
-template <typename T, int N>
+template<typename T, int N>
 class Stack {
 public:
     Stack() noexcept : m_items{}, m_topPos(-1) {}
 
-    bool isEmpty() noexcept { return m_topPos == -1; }
-    bool isFull() noexcept { return m_topPos == N - 1; }
+    bool isEmpty() const noexcept { return m_topPos == -1; }
+    bool isFull() const noexcept { return m_topPos == N - 1; }
     
-    int getLength() noexcept { return m_topPos + 1; }
-    int getMaxLength() noexcept { return N; }
+    int getLength() const noexcept { return m_topPos + 1; }
+    constexpr int getMaxLength() const noexcept { return N; }
     
-    T& top() {
+    T& getTop() {
         if (isEmpty()) {
             throw std::out_of_range("stack is empty.");
         }
@@ -40,35 +40,29 @@ private:
 };
 
 int main() {
-    Stack<int, 3> s1{};
+    Stack<int, 3> s;
     
     try {
-        std::cout << s1.pop() << "\n";
+        std::cout << "Popped item: " << s.pop() << "\n";
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
     
-    s1.push(1);
-    std::cout << "top: " << s1.top() << "\n";
-    
-    s1.push(2);
-    std::cout << "top: " << s1.top() << "\n";
-    
-    s1.push(3);
-    std::cout << "top: " << s1.top() << "\n";
-    
     try {
-        s1.push(4);
+        for (int i = 0; i < 4; ++i) {
+            s.push(i);
+            std::cout << "Item " << i << " pushed.\n"
+                << "Item on top of stack is: " 
+                << s.getTop() << "\n";
+        }
     } catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
     
-    std::cout << "Popped item: " << s1.pop() << "\n";
-    std::cout << "Popped item: " << s1.pop() << "\n";
-    std::cout << "Popped item: " << s1.pop() << "\n";
-    
     try {
-        std::cout << "Popped item: " << s1.pop() << "\n";        
+        for (int i = 0; i < 4; ++i) {
+            std::cout << "Popped item: " << s.pop() << "\n";    
+        }
     } catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
