@@ -1,48 +1,35 @@
 #include <array>
-#include <stdexcept>
 #include <iostream>
 
 template <typename T, int N>
 class Stack {
 public:
-    Stack() : m_items{}, m_topPos(-1) {}
+    Stack() noexcept : m_items{}, m_topPos(-1) {}
 
-    Stack(std::initializer_list<T> items) {
-        if (items.size() > N) {
-            throw std::out_of_range("size of items > size of stack.");
-        }
-    
-        int i = 0;
-        
-        for (auto it = items.begin();
-            it != items.end() && i < N; ++it) 
-        {
-            m_items[i++] = *it; 
-        }
-        
-        m_topPos = i - 1;
-    }
-    
     bool isEmpty() noexcept { return m_topPos == -1; }
+    bool isFull() noexcept { return m_topPos == N - 1; }
     
-    std::size_t getLength() noexcept { return m_topPos + 1; }
-    std::size_t getMaxLength() noexcept { return N; }
+    int getLength() noexcept { return m_topPos + 1; }
+    int getMaxLength() noexcept { return N; }
     
     T& top() {
+        if (isEmpty()) {
+            throw std::out_of_range("stack is empty.");
+        }
         return m_items[m_topPos];
     }
     
     void push(const T& item) {
-        if (m_topPos == N - 1) {
-            throw std::out_of_range("overflow");
+        if (isFull()) {
+            throw std::out_of_range("stack is full.");
         }
         
         m_items[++m_topPos] = item;
     }
     
     [[nodiscard]] T& pop() {
-        if (m_topPos == -1) {
-            throw std::out_of_range("underflow");
+        if (isEmpty()) {
+            throw std::out_of_range("stack is empty.");
         }
         
         return m_items[m_topPos--];
@@ -85,8 +72,4 @@ int main() {
     } catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
-    
-    Stack<int, 3> s2{1, 2};
-    
-    std::cout <<"Popped item: " << s2.pop();
 }
