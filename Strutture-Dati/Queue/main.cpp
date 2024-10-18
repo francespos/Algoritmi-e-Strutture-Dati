@@ -17,27 +17,15 @@ public:
     }
     
     int getLength() const noexcept {
-        return m_tail - m_head; 
+        if (m_tail >= m_head) {
+            return m_tail - m_head;
+        } else {
+            return N - (m_head - m_tail);
+        }
     }
     
     constexpr int getMaxLength() const noexcept {
         return N; 
-    }
-    
-    T& getFront() {
-        if (isEmpty()) {
-            throw std::out_of_range("queue is empty.");
-        }
-        
-        return m_items[m_head];
-    }
-    
-    T& getBack() {
-        if (isEmpty()) {
-            throw std::out_of_range("queue is empty.");
-        }
-        
-        return m_items[m_tail];
     }
     
     void enqueue(const T& item) {
@@ -49,7 +37,7 @@ public:
         m_tail = (m_tail + 1) % N;
     }
     
-    [[nodiscard]] T& deque() {
+    [[nodiscard]] T& dequeue() {
         if (isEmpty()) {
             throw std::out_of_range("queue is empty.");
         }
@@ -69,7 +57,7 @@ int main() {
     Queue<int, 4> q;
     
     try {
-        std::cout << "Item dequeued: " << q.deque()
+        std::cout << "Item dequeued: " << q.dequeue()
             << "\n";
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() 
@@ -96,7 +84,7 @@ int main() {
     
     try {
         for (int i = 0; i < 4; ++i) {
-            std::cout << "Item dequed: "<< q.deque() 
+            std::cout << "Item dequeued: "<< q.dequeue() 
                 << ".\n";
         }
         
