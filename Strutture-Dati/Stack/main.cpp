@@ -1,9 +1,8 @@
 #include <array>
 #include <iostream>
 
-template<typename T, int N>
+template<typename T, int N> requires (N > 0)
 class Stack {
-    static_assert(N > 0);
 public:
     Stack() noexcept : m_items{}, m_topPos(-1) {}
     
