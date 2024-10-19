@@ -3,8 +3,17 @@
 
 template<typename T, int N>
 class Stack {
+    static_assert(N > 0);
 public:
     Stack() noexcept : m_items{}, m_topPos(-1) {}
+    
+    constexpr int getMaxLength() const noexcept {
+        return N;
+    }
+    
+    int getLength() const noexcept {
+        return m_topPos + 1;
+    }
 
     bool isEmpty() const noexcept {
         return m_topPos == -1; 
@@ -12,14 +21,6 @@ public:
     
     bool isFull() const noexcept {
         return m_topPos == N - 1;
-    }
-    
-    int getLength() const noexcept {
-        return m_topPos + 1;
-    }
-    
-    constexpr int getMaxLength() const noexcept {
-        return N;
     }
     
     T& getTop() {
@@ -52,10 +53,14 @@ private:
 int main() {
     Stack<int, 3> s;
     
+    std::cout << "Stack length: " << s.getLength() 
+        << "\nStack max length: " << s.getMaxLength()
+        << "\n\n";
+    
     try {
-        std::cout << "Popped item: " << s.pop() << "\n";
+        std::cout << "Popped item: " << s.pop() << "\n\n";
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
     try {
@@ -64,14 +69,17 @@ int main() {
             std::cout << "Item " << i << " pushed.\n"
                 << "Item on top of stack is: " 
                 << s.getTop() << "\n";
+                
+            std::cout << "Stack length: " << s.getLength() << "\n\n";
         }
     } catch(const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
     try {
         for (int i = 0; i < 4; ++i) {
             std::cout << "Popped item: " << s.pop() << "\n";    
+            std::cout << "Stack length: " << s.getLength() << "\n\n";
         }
     } catch(const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

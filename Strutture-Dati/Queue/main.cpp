@@ -4,18 +4,15 @@
 
 template<typename T, int N>
 class Queue {
+    static_assert(N > 0);
 public:
     Queue() noexcept 
         : m_items{}, m_head(0), m_tail(0) {}
         
-    bool isEmpty() const noexcept {
-        return m_head == m_tail;
+    constexpr int getMaxLength() const noexcept {
+        return N; 
     }
-    
-    bool isFull() const noexcept {
-        return m_head == (m_tail + 1) % N;
-    }
-    
+        
     int getLength() const noexcept {
         if (m_tail >= m_head) {
             return m_tail - m_head;
@@ -23,9 +20,13 @@ public:
             return N - (m_head - m_tail);
         }
     }
+        
+    bool isEmpty() const noexcept {
+        return m_head == m_tail;
+    }
     
-    constexpr int getMaxLength() const noexcept {
-        return N; 
+    bool isFull() const noexcept {
+        return m_head == (m_tail + 1) % N;
     }
     
     void enqueue(const T& item) {
@@ -57,44 +58,35 @@ int main() {
     Queue<int, 4> q;
     
     try {
-        std::cout << "Item dequeued: " << q.dequeue()
-            << "\n";
+        std::cout << "Item dequeued: " << q.dequeue() << "\n";
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() 
-            << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
 
-    std::cout << "Queue length: " << q.getLength()
-        << "\n";
+    std::cout << "Queue length: " << q.getLength() 
+        << "\nQueue max length: " << q.getMaxLength() << "\n\n";
         
     try {
         for (int i = 0; i < 4; ++i) {
             q.enqueue(i);
-            std::cout << "Item " << i << " enqueued.\n";
-            std::cout << "Queue length: " << q.getLength()
-                << "\n";
+            std::cout << "Item " << i << " enqueued.\n"
+                << "Queue length: " << q.getLength() << "\n\n";
         }
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() 
-            << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
     std::cout << "Queue length: " << q.getLength()
-        << "\n";
+        << "\n\n";
     
     try {
         for (int i = 0; i < 4; ++i) {
-            std::cout << "Item dequeued: "<< q.dequeue() 
-                << ".\n";
+            std::cout << "Item dequeued: "<< q.dequeue() << ".\n"
+                << "Queue length: " << q.getLength() << "\n\n";
         }
-        
-        std::cout << "Queue length: " << q.getLength()
-            << "\n";
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() 
-            << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
-    std::cout << "Queue length: " << q.getLength()
-        << "\n";
+    std::cout << "Queue length: " << q.getLength() << "\n";
 }
