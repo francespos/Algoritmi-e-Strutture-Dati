@@ -49,7 +49,7 @@ public:
         return operator[](pos);
     }
 
-    std::shared_ptr<Node> find(T value) noexcept {
+    std::shared_ptr<Node> find(const T& value) noexcept {
         auto node = m_head;
 
         while (node != nullptr && node->value != value) {

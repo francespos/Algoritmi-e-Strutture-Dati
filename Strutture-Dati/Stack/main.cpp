@@ -71,7 +71,7 @@ int main() {
                 
             std::cout << "Stack length: " << s.getLength() << "\n\n";
         }
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
@@ -80,7 +80,7 @@ int main() {
             std::cout << "Popped item: " << s.pop() << "\n";    
             std::cout << "Stack length: " << s.getLength() << "\n\n";
         }
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 }

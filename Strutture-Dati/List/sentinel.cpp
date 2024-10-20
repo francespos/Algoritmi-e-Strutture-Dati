@@ -66,7 +66,7 @@ public:
         return node;
     }
 
-    std::shared_ptr<Node> find(T value) {
+    std::shared_ptr<Node> find(const T& value) {
         auto node = m_head->next;
 
         while (node != m_head && node->value != value) {
