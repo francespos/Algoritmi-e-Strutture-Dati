@@ -1,10 +1,7 @@
-// Non ancora concluso
+// Non ancora concluso, ma quasi
 #include <vector>
-#include <algorithm>
 #include <iostream>
 
-// Dato un vettore, restituisce la somma degli elementi con indice compreso tra
-// p ed r.
 int sum(const std::vector<int>& v, int p, int r) {
     int sum = 0;
     
@@ -15,39 +12,52 @@ int sum(const std::vector<int>& v, int p, int r) {
     return sum;
 }
 
-// Trova il massimo tra la somma degli elementi compresi tra p e r e la somma
-// degli elementi compresi tra r + 1 e s.
-int getMax(const std::vector<int>& v, int p, int r, int s) {
-    return std::max(sum(v, p, r), sum(v, r + 1, s));
-}
-
 struct Indices {
     int p, r;
 };
 
-// Dato un vettore e una sequenza di indici crescente che identifica una
-// partizione del vettore, restituisce l'indice iniziale della partizione
-// la cui somma degli elementi è massima.
-int findMaxSumPartitionIndex(const std::vector<int>& v, 
-    const std::vector<int>& indices, int pos) 
+Indices findMaxSumPartitionIndices(const std::vector<int>& v, 
+    const std::vector<int>& indicesSeq, int pos) 
 {
-    int max = getMax(v, indices[0], indices[2], indices[1]);
-    
-    int j = 2;
-    
-    for (int i = 3; i < pos; ++i) {
-        const auto value 
-            = getMax(v, indices[i - 2], indices[i], indices[i - 1]);
-        if (max < value) {
-            max = value;
-            j = i;
+    Indices indices;
+
+    {
+        const auto p = indicesSeq[0];
+        const auto q = indicesSeq[1];
+        const auto r = indicesSeq[2];
+        
+        const auto leftSum = sum(v, p, q);
+        const auto rightSum = sum(v, q + 1, r);
+        
+        if (leftSum < rightSum) {
+            indices.p = q + 1;
+            indices.r = r;
         }
+        
+        indices.p = p;
+        indices.r = q;
     }
     
-    return indices[j];
+    for (int i = 1; i < pos - 2; ++i) {
+        const auto p = indicesSeq[i];
+        const auto q = indicesSeq[i + 1];
+        const auto r = indicesSeq[i + 2];
+        
+        const auto leftSum = sum(v, p, q);
+        const auto rightSum = sum(v, q + 1, r);
+        
+        if (leftSum < rightSum) {
+            indices.p = q + 1;
+            indices.r = r;
+        }
+        
+        indices.p = p;
+        indices.r = q;   
+    }
+    
+    return indices;
 }
 
-// 
 int getPartitionIndex(const std::vector<int>& v, int p, int r) {
     int leftSum = 0;
     int rightSum = sum(v, p, r);
@@ -59,36 +69,39 @@ int getPartitionIndex(const std::vector<int>& v, int p, int r) {
         rightSum -= v[q];
     }
     
-    return q;
+    return q - 1;
 }
 
-void partition(const std::vector<int>& v, std::vector<int>& indices, 
-    int pos) 
+void partition(const std::vector<int>& v, std::vector<int>& indicesSeq, int pos) 
 {
-    if (pos == indices.size()) {
-        return;
-    }
-    
     if (pos == 2) {
-        indices[2] = getPartitionIndex(v, 0, indices[1]);
-        partition(v, indices, 3);
+        const auto r = indicesSeq[1];
+        
+        indicesSeq[1] = getPartitionIndex(v, 0, r);
+        indicesSeq[2] = r;
+        
+        partition(v, indicesSeq, 3);
+    } else if (pos != indicesSeq.size()) {
+        const auto r = indicesSeq[pos - 1];
+        const auto indices = findMaxSumPartitionIndices(v, indicesSeq, pos);
+        
+        indicesSeq[pos - 1] = getPartitionIndex(v, indices.p, indices.r);
+        indicesSeq[pos] = r;
+        
+        partition(v, indicesSeq, ++pos);
     }
-
-    indices[pos] = getPartitionIndex(v, indices[pos - 1], indices[2]);
-    partition(v, indices, ++pos);
 }
 
 int main() {
-    int k = 3;
+    int k = 4 // correggere;
     std::vector<int> v{100, 200, 300, 400, 500, 600, 700, 800, 900};
     
-    std::vector<int> indices(k, 0);
-    indices[1] = v.size() - 1;
+    std::vector<int> indicesSeq(k, 0);
+    indicesSeq[1] = v.size() - 1;
     
-    partition(v, indices, 2, k);
+    partition(v, indicesSeq, 2);
     
     for (int i = 0; i < k; ++i) {
-        std::cout << indices[i] << " ";
+        std::cout << indicesSeq[i] << " ";
     }
-    
 }
