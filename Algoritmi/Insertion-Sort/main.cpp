@@ -4,16 +4,16 @@
 
 template<typename T> requires std::totally_ordered<T>
 void sort(std::vector<T>& v) noexcept {
-    for (int i = 1; i < v.size(); ++i) {
+    for (std::size_t i = 1; i < v.size(); ++i) {
         const auto key = v[i];
-        auto j = i - 1;
+        auto j = i;
 
-        while (j >= 0 & v[j] > key) {
-            v[j + 1] = v[j];
+        while (j > 0 && v[j - 1] > key) {
+            v[j] = v[j - 1];
             --j;
         }
 
-        v[j + 1] = key;
+        v[j] = key;
     }
 }
 

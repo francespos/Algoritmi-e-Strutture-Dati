@@ -19,8 +19,8 @@ public:
         m_head = node;
     }
     
-    int getLength() const noexcept {
-        int length = 0;
+    std::size_t getLength() const noexcept {
+        std::size_t length = 0;
         
         for (auto node = m_head->next; node != m_head; node = node->next) {
             ++length;
@@ -39,10 +39,9 @@ public:
         return node;
     }
     
-    std::shared_ptr<Node> operator[](int pos) noexcept {
+    std::shared_ptr<Node> operator[](std::size_t pos) noexcept {
         auto node = m_head->next;
-        
-        int i = 0;
+        std::size_t i = 0;
         
         while (node != m_head && i < pos) {
             node = node->next;
@@ -56,7 +55,7 @@ public:
         return node;
     }
     
-    std::shared_ptr<Node> get(int pos) {
+    std::shared_ptr<Node> get(std::size_t pos) {
         auto node = operator[](pos);
         
         if (node == nullptr && m_head != m_head->next) {
@@ -132,7 +131,7 @@ int main() {
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
-    for (int i = 0; i < 3; ++i) {
+    for (std::size_t i = 0; i < 3; ++i) {
         std::cout << l[i]->value << " ";
     }
     std::cout << "]\n\n";
@@ -154,7 +153,7 @@ int main() {
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
-    for (int i = 0; i < 2; ++i) {
+    for (std::size_t i = 0; i < 2; ++i) {
         std::cout << l[i]->value << " ";
     }
     std::cout << "]\n\n";

@@ -2,17 +2,17 @@
 #include <stdexcept>
 #include <iostream>
 
-template<typename T, int N> requires (N > 0)
+template<typename T, std::size_t N> requires (N != 0)
 class Queue {
 public:
     Queue() noexcept 
         : m_items{}, m_head(0), m_tail(0) {}
         
-    constexpr int getMaxLength() const noexcept {
+    constexpr std::size_t getMaxLength() const noexcept {
         return N; 
     }
         
-    int getLength() const noexcept {
+    std::size_t getLength() const noexcept {
         if (m_tail >= m_head) {
             return m_tail - m_head;
         } else {
@@ -49,8 +49,8 @@ public:
     }
 private:
     std::array<T, N> m_items;
-    int m_head;
-    int m_tail;
+    std::size_t m_head;
+    std::size_t m_tail;
 };
 
 int main() {
@@ -62,30 +62,26 @@ int main() {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
 
-    std::cout << "Queue length: " << q.getLength() 
-        << "\nQueue max length: " << q.getMaxLength() << "\n\n";
+    std::cout << "Queue length: " << q.getLength() << "\nQueue max length: " 
+        << q.getMaxLength() << "\n\n";
         
     try {
         for (int i = 0; i < 4; ++i) {
             q.enqueue(i);
-            std::cout << "Item " << i << " enqueued.\n"
-                << "Queue length: " << q.getLength() << "\n\n";
+            std::cout << "Item " << i << " enqueued.\n" << "Queue length: " 
+                << q.getLength() << "\n\n";
         }
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
-    
-    std::cout << "Queue length: " << q.getLength()
-        << "\n\n";
+
     
     try {
-        for (int i = 0; i < 4; ++i) {
-            std::cout << "Item dequeued: "<< q.dequeue() << ".\n"
+        for (std::size_t i = 0; i < 4; ++i) {
+            std::cout << "Item dequeued: " << q.dequeue() << ".\n"
                 << "Queue length: " << q.getLength() << "\n\n";
         }
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
-    
-    std::cout << "Queue length: " << q.getLength() << "\n";
 }
