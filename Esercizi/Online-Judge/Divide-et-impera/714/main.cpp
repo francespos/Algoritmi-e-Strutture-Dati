@@ -1,8 +1,10 @@
-// Non ancora concluso, ma quasi
+// Mi trovo (almeno con i casi di test forniti), manca solo il calcolo della 
+// complessità
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
-int sum(const std::vector<int>& v, int p, int r) {
+int getSum(const std::vector<int>& v, int p, int r) {
     int sum = 0;
     
     for (int i = p; i <= r; ++i) {
@@ -20,39 +22,37 @@ Indices findMaxSumPartitionIndices(const std::vector<int>& v,
     const std::vector<int>& indicesSeq, int pos) 
 {
     Indices indices;
+    int max;
 
-    {
-        const auto p = indicesSeq[0];
-        const auto q = indicesSeq[1];
-        const auto r = indicesSeq[2];
-        
-        const auto leftSum = sum(v, p, q);
-        const auto rightSum = sum(v, q + 1, r);
-        
-        if (leftSum < rightSum) {
-            indices.p = q + 1;
-            indices.r = r;
-        }
-        
-        indices.p = p;
-        indices.r = q;
+    auto p = indicesSeq[0];
+    const auto q = indicesSeq[1];
+    auto r = indicesSeq[2];
+    
+    const auto leftSum = getSum(v, p, q);
+    const auto rightSum = getSum(v, q + 1, r);
+    
+    if (leftSum < rightSum) {
+        indices.p = q + 1;
+        indices.r = r;
+        max = rightSum;
     }
     
-    for (int i = 1; i < pos - 2; ++i) {
-        const auto p = indicesSeq[i];
-        const auto q = indicesSeq[i + 1];
-        const auto r = indicesSeq[i + 2];
+    indices.p = p;
+    indices.r = q;
+    
+    max = leftSum;
+    
+    for (int i = 2; i < pos - 2; ++i) {
+        p = indicesSeq[i];
+        r = indicesSeq[i + 1];
         
-        const auto leftSum = sum(v, p, q);
-        const auto rightSum = sum(v, q + 1, r);
+        const auto sum = getSum(v, p, r);
         
-        if (leftSum < rightSum) {
-            indices.p = q + 1;
+        if (sum > max) {
+            indices.p = p;
             indices.r = r;
+            max = sum;
         }
-        
-        indices.p = p;
-        indices.r = q;   
     }
     
     return indices;
@@ -60,7 +60,7 @@ Indices findMaxSumPartitionIndices(const std::vector<int>& v,
 
 int getPartitionIndex(const std::vector<int>& v, int p, int r) {
     int leftSum = 0;
-    int rightSum = sum(v, p, r);
+    int rightSum = getSum(v, p, r);
     
     int q;
     
@@ -72,36 +72,80 @@ int getPartitionIndex(const std::vector<int>& v, int p, int r) {
     return q - 1;
 }
 
-void partition(const std::vector<int>& v, std::vector<int>& indicesSeq, int pos) 
+void setPartitionIndicesSeq(const std::vector<int>& v, 
+    std::vector<int>& indicesSeq, int pos) 
 {
     if (pos == 2) {
         const auto r = indicesSeq[1];
         
         indicesSeq[1] = getPartitionIndex(v, 0, r);
         indicesSeq[2] = r;
+
         
-        partition(v, indicesSeq, 3);
+        setPartitionIndicesSeq(v, indicesSeq, 3);
     } else if (pos != indicesSeq.size()) {
-        const auto r = indicesSeq[pos - 1];
         const auto indices = findMaxSumPartitionIndices(v, indicesSeq, pos);
         
-        indicesSeq[pos - 1] = getPartitionIndex(v, indices.p, indices.r);
-        indicesSeq[pos] = r;
+        indicesSeq[pos] = getPartitionIndex(v, indices.p, indices.r);
+        std::sort(indicesSeq.begin() + 1, indicesSeq.begin() + pos + 1);
         
-        partition(v, indicesSeq, ++pos);
+        setPartitionIndicesSeq(v, indicesSeq, ++pos);
+    }
+}
+
+std::vector<int> getPartitionIndices(const std::vector<int>& v, int k) {
+    std::vector<int> indicesSeq(k + 1, 0);
+    
+    indicesSeq[1] = v.size() - 1;
+    setPartitionIndicesSeq(v, indicesSeq, 2);
+    
+    return indicesSeq;
+}
+
+void printPartition(const std::vector<int>& v, 
+    const std::vector<int>& indicesSeq)
+{
+    int j = 1;
+    
+    for (int i = 0; i < v.size(); ++i) {
+        std::cout << v[i] << " ";
+        
+        if (indicesSeq[j] == i) {
+            std::cout << "/ ";
+            
+            if (j < indicesSeq.size() - 2) {
+                ++j;
+            }
+        }
     }
 }
 
 int main() {
-    int k = 4 // correggere;
-    std::vector<int> v{100, 200, 300, 400, 500, 600, 700, 800, 900};
+    int numTestCases;
+    std::cin >> numTestCases;
     
-    std::vector<int> indicesSeq(k, 0);
-    indicesSeq[1] = v.size() - 1;
+    std::vector<std::vector<int>> vv(numTestCases);
+    std::vector<std::vector<int>> indicesSeqs(numTestCases);
     
-    partition(v, indicesSeq, 2);
+    for (int i = 0; i < numTestCases; ++i) {
+        int m;
+        std::cin >> m;
+        
+        std::vector<int> v(m);
+        
+        int k;
+        std::cin >> k;
+        
+        for (int j = 0; j < m; ++j) {
+            std::cin >> v[j];
+        }
+        
+        vv[i] = v;
+        indicesSeqs[i] = getPartitionIndices(v, k);
+    }
     
-    for (int i = 0; i < k; ++i) {
-        std::cout << indicesSeq[i] << " ";
+    for (int i = 0; i < numTestCases; ++i) {
+        printPartition(vv[i], indicesSeqs[i]);
+        std::cout << "\n";
     }
 }
