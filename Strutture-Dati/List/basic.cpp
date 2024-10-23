@@ -5,12 +5,19 @@
 template<typename T>
 class List {
 public:
-    struct Node {
-        T value;
-        std::shared_ptr<Node> prev, next;
+    class Node {
+    public:
+        friend class List;
         
         Node(const T& value) noexcept 
-            : value(value), prev(nullptr), next(nullptr) {}
+            : m_value(value), m_prev(nullptr), m_next(nullptr) {}
+            
+        const T& getValue() const noexcept {
+            return m_value;
+        }
+    private:
+        T m_value;
+        std::shared_ptr<Node> m_prev, m_next;
     };
     
     List() noexcept : m_head(nullptr) {}
@@ -18,30 +25,30 @@ public:
     std::size_t getLength() const noexcept {
         std::size_t length = 0;
         
-        for (auto node = m_head; node != nullptr; node = node->next) {
+        for (auto node = m_head; node != nullptr; node = node->m_next) {
             ++length;
         }
         
         return length;
     }
     
-    std::shared_ptr<Node> getHead() noexcept {
-        return m_head;
+    std::shared_ptr<const Node> getHead() const noexcept {
+        return std::const_pointer_cast<const Node>(m_head);
     }
     
-    std::shared_ptr<Node> operator[](std::size_t pos) {
+    std::shared_ptr<const Node> operator[](std::size_t pos) const {
         auto node = m_head;
         std::size_t i = 0;
         
         while (node != nullptr && i < pos) {
-            node = node->next;
+            node = node->m_next;
             ++i;
         }
         
-        return node;
+        return std::const_pointer_cast<const Node>(node);
     }
     
-    std::shared_ptr<Node> get(std::size_t pos) {
+    std::shared_ptr<const Node> get(std::size_t pos) const {
         if (pos >= getLength()) {
             throw std::out_of_range("index is too big.");
         }
@@ -49,14 +56,14 @@ public:
         return operator[](pos);
     }
 
-    std::shared_ptr<Node> find(const T& value) noexcept {
+    std::shared_ptr<const Node> find(const T& value) const noexcept {
         auto node = m_head;
 
-        while (node != nullptr && node->value != value) {
-            node = node->next;
+        while (node != nullptr && node->m_value != value) {
+            node = node->m_next;
         }
 
-        return node;
+        return std::const_pointer_cast<const Node>(node);
     }
     
     void insert(std::shared_ptr<Node> node) {
@@ -64,28 +71,28 @@ public:
             throw std::invalid_argument("argument is a nullptr.");
         }
         
-        node->next = m_head;
+        node->m_next = m_head;
 
         if (m_head != nullptr) {
-            m_head->prev = node;
+            m_head->m_prev = node;
         }
         
         m_head = node;
     }
     
-    void remove(std::shared_ptr<Node> node) {
+    void remove(std::shared_ptr<const Node> node) {
         if (node == nullptr) {
             throw std::invalid_argument("argument is a nullptr.");
         }
         
-        if (node->prev == nullptr) {
-            m_head = node->next;
+        if (node->m_prev == nullptr) {
+            m_head = node->m_next;
         } else {
-            node->prev->next = node->next;
+            node->m_prev->m_next = node->m_next;
         }
         
-        if (node->next != nullptr) {
-            node->next->prev = node->prev;
+        if (node->m_next != nullptr) {
+            node->m_next->m_prev = node->m_prev;
         }
     }
 private:
@@ -100,7 +107,7 @@ int main() {
     
     l.insert(node1);
     std::cout << "Node with value 1 inserted.\n"
-        << "Value of head: " << l.getHead()->value << "\n\n"; 
+        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
     
     std::cout << "List length: " << l.getLength() << "\n\n";
     
@@ -108,7 +115,7 @@ int main() {
     
     l.insert(node2);
     std::cout << "Node with value 2 inserted.\n"
-        << "Value of head: " << l.getHead()->value << "\n\n"; 
+        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
         
     std::cout << "List length: " << l.getLength() << "\n\n";
     
@@ -116,18 +123,18 @@ int main() {
     
     l.insert(node3);
     std::cout << "Node with value 3 inserted.\n"
-        << "Value of head: " << l.getHead()->value << "\n\n"; 
+        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
         
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
     for (std::size_t i = 0; i < 3; ++i) {
-        std::cout << l[i]->value << " ";
+        std::cout << l[i]->getValue() << " ";
     }
     std::cout << "]\n\n";
     
     try {
-        std::cout << "List fourth element: " << l.get(3)->value << "\n\n";
+        std::cout << "List fourth element: " << l.get(3)->getValue() << "\n\n";
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
@@ -144,7 +151,7 @@ int main() {
     
     std::cout << "List = [ ";
     for (std::size_t i = 0; i < 2; ++i) {
-        std::cout << l[i]->value << " ";
+        std::cout << l[i]->getValue() << " ";
     }
     std::cout << "]\n\n";
 

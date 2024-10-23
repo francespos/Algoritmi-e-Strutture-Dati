@@ -11,68 +11,69 @@ concept Printable = requires(std::ostream& out, T t) {
 };
 
 template<typename T>
-concept TotallyOrdered = std::totally_ordered<T>;
-
-template<typename T>
-concept PrintableAndOrdered = Printable<T> && TotallyOrdered<T>;
+concept PrintableAndOrdered = Printable<T> && std::totally_ordered<T>;
 
 template<PrintableAndOrdered Key>
 class BinarySearchTree {
 public:
-    struct Node {
-        Key key;
-        std::shared_ptr<Node> parent, left, right;
-        
+    class Node {
+    public:
+        friend class BinarySearchTree;
+    
         Node(const Key& key) noexcept 
-            : key(key), parent(nullptr), left(nullptr), right(nullptr) {}
+            : m_key(key), m_parent(nullptr), m_left(nullptr), m_right(nullptr) 
+        {}
+    private:
+        Key m_key;
+        std::shared_ptr<Node> m_parent, m_left, m_right;
     };
     
     BinarySearchTree() noexcept : m_root(nullptr) {}
     
-    std::shared_ptr<Node> getRoot() noexcept {
-        return m_root;
+    std::shared_ptr<const Node> getRoot() const noexcept {
+        return std::const_pointer_cast<const Node>(m_root);
     }
     
     bool isEmpty() const noexcept {
         return m_root == nullptr;
     }
     
-    void inorderWalk(std::shared_ptr<Node> node, std::ostream& out) const 
+    void inorderWalk(std::shared_ptr<const Node> node, std::ostream& out) const 
         noexcept 
     {
         if (node != nullptr) {
-            inorderWalk(node->left, out);
-            out << node->key << " ";
-            inorderWalk(node->right, out);
+            inorderWalk(node->m_left, out);
+            out << node->m_key << " ";
+            inorderWalk(node->m_right, out);
         }
     }
     
-    std::shared_ptr<Node> find(std::shared_ptr<Node> node, const Key& key) const 
-        noexcept 
+    std::shared_ptr<const Node> find(std::shared_ptr<const Node> node, 
+        const Key& key) const noexcept 
     {
-        if (node == nullptr || key == node->key) {
-            return node;
+        if (node == nullptr || key == node->m_key) {
+            return std::const_pointer_cast<const Node>(node);
         }
         
-        if (key < node->key) {
-            return find(node->left, key);
+        if (key < node->m_key) {
+            return find(node->m_left, key);
         } else {
-            return find(node->right, key);
+            return find(node->m_right, key);
         }
     }
     
-    std::shared_ptr<Node> find(const Key& key) const noexcept {
+    std::shared_ptr<const Node> find(const Key& key) const noexcept {
         auto node = m_root;
         
-        while (node != nullptr && key != node->key) {
-            if (key < node->key) {
-                node = node->left;
+        while (node != nullptr && key != node->m_key) {
+            if (key < node->m_key) {
+                node = node->m_left;
             } else {
-                node = node->right;
+                node = node->m_right;
             }
         }
         
-        return node;
+        return std::const_pointer_cast<const Node>(node);
     }
     
     const Key& getMin() const {
@@ -82,11 +83,11 @@ public:
     
         auto node = m_root;
         
-        while (node->left != nullptr) {
-            node = node->left;
+        while (node->m_left != nullptr) {
+            node = node->m_left;
         }
         
-        return node->key;
+        return node->m_key;
     }
     
     const Key& getMax() const {
@@ -96,11 +97,11 @@ public:
     
         auto node = m_root;
         
-        while (node->right != nullptr) {
-            node = node->right;
+        while (node->m_right != nullptr) {
+            node = node->m_right;
         }
         
-        return node->key;
+        return node->m_key;
     }
     
     void insert(std::shared_ptr<Node> node) {
@@ -114,21 +115,21 @@ public:
         while (child != nullptr) {
             parent = child;
             
-            if (node->key < child->key) {
-                child = child->left;
+            if (node->m_key < child->m_key) {
+                child = child->m_left;
             } else {
-                child = child->right;
+                child = child->m_right;
             }
         }
         
-        node->parent = node;
+        node->m_parent = parent;
         
         if (parent == nullptr) {
             m_root = node;
-        } else if (node->key < parent->key) {
-            parent->left = node;
+        } else if (node->m_key < parent->m_key) {
+            parent->m_left = node;
         } else {
-            parent->right = node;
+            parent->m_right = node;
         }
     }
 private:
