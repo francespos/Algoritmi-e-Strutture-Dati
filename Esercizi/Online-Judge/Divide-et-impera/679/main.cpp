@@ -1,4 +1,5 @@
-// Funziona, ma manca il calcolo della complessità.
+// La complessita' e' Theta(d * n), dove d e' la profonfita' dell'albero e n e' 
+// il numero di palle.
 #include <deque>
 #include <iostream>
 #include <cmath>

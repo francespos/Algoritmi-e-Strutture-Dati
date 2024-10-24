@@ -17,7 +17,7 @@ int max(const std::vector<int>& v, int oldMax, int pos) {
 }
 
 int max(const std::vector<int>& v) {
-    return max(v, 0, 0);
+    return max(v, v[0], 1);
 }
 
 int main() {

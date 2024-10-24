@@ -1,5 +1,7 @@
 // Mi trovo (almeno con i casi di test forniti), manca solo il calcolo della 
-// complessità
+// complessita'. Inoltre, la soluzione e' subottima, in quanto non ho creato
+// una funzione per l'inserimento in ordine, ma essendo l'esercizio 
+// inutilmente complesso, molto probabilmente non ci ritornero' piu'.
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -87,6 +89,9 @@ void setPartitionIndicesSeq(const std::vector<int>& v,
         const auto indices = findMaxSumPartitionIndices(v, indicesSeq, pos);
         
         indicesSeq[pos] = getPartitionIndex(v, indices.p, indices.r);
+        
+        // Questa e' la parte subottima. Qui avrei dovuto fare un inserimento
+        // in ordine piuttosto che una sort.
         std::sort(indicesSeq.begin() + 1, indicesSeq.begin() + pos + 1);
         
         setPartitionIndicesSeq(v, indicesSeq, ++pos);
