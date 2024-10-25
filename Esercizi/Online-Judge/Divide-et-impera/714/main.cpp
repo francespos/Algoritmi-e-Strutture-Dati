@@ -1,7 +1,11 @@
-// Mi trovo (almeno con i casi di test forniti), manca solo il calcolo della 
-// complessita'. Inoltre, la soluzione e' subottima, in quanto non ho creato
-// una funzione per l'inserimento in ordine, ma essendo l'esercizio 
-// inutilmente complesso, molto probabilmente non ci ritornero' piu'.
+// Mi trovo (almeno con i casi di test forniti).
+// Per quanto riguarda il calcolo della complessita', osserviamo che ciascuna 
+// delle n iterazioni ha complessità nel caso peggiore pari a doppio della
+// dimensione della sequenza al momento dell'iterazione (perche' sia 
+// l'inserimento in ordine che l'operazione per determinare l'indice della 
+// partizione hanno complessita' lineare), per cui:
+// T(n) = sum_{i=2}^n i.
+// Facendo i calcoli, si ottiene O(n^2).
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -74,35 +78,37 @@ int getPartitionIndex(const std::vector<int>& v, int p, int r) {
     return q - 1;
 }
 
+void insertInOrder(std::vector<int>& indicesSeq, int index) {
+    int i = 0;
+    
+    while (index > indicesSeq[i]) {
+        ++i;
+    }
+    
+    indicesSeq.insert(indicesSeq.begin() + i, index);
+}
+
 void setPartitionIndicesSeq(const std::vector<int>& v, 
-    std::vector<int>& indicesSeq, int pos) 
+    std::vector<int>& indicesSeq, int pos, int k) 
 {
     if (pos == 2) {
-        const auto r = indicesSeq[1];
+        insertInOrder(indicesSeq, getPartitionIndex(v, 0, indicesSeq[1]));
         
-        indicesSeq[1] = getPartitionIndex(v, 0, r);
-        indicesSeq[2] = r;
-
-        
-        setPartitionIndicesSeq(v, indicesSeq, 3);
-    } else if (pos != indicesSeq.size()) {
+        setPartitionIndicesSeq(v, indicesSeq, 3, k);
+    } else if (pos < k) {
         const auto indices = findMaxSumPartitionIndices(v, indicesSeq, pos);
         
-        indicesSeq[pos] = getPartitionIndex(v, indices.p, indices.r);
+        const auto partitionIndex = getPartitionIndex(v, indices.p, indices.r);
+        insertInOrder(indicesSeq, partitionIndex);
         
-        // Questa e' la parte subottima. Qui avrei dovuto fare un inserimento
-        // in ordine piuttosto che una sort.
-        std::sort(indicesSeq.begin() + 1, indicesSeq.begin() + pos + 1);
-        
-        setPartitionIndicesSeq(v, indicesSeq, ++pos);
+        setPartitionIndicesSeq(v, indicesSeq, pos + 1, k);
     }
 }
 
 std::vector<int> getPartitionIndices(const std::vector<int>& v, int k) {
-    std::vector<int> indicesSeq(k + 1, 0);
-    
-    indicesSeq[1] = v.size() - 1;
-    setPartitionIndicesSeq(v, indicesSeq, 2);
+    std::vector<int> indicesSeq{0, static_cast<int>(v.size() - 1)};
+
+    setPartitionIndicesSeq(v, indicesSeq, 2, k + 1);
     
     return indicesSeq;
 }

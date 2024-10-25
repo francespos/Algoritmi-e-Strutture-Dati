@@ -38,13 +38,13 @@ public:
         return m_root == nullptr;
     }
     
-    void inorderWalk(std::shared_ptr<const Node> node, std::ostream& out) const 
+    void inOrderWalk(std::shared_ptr<const Node> node, std::ostream& out) const 
         noexcept 
     {
         if (node != nullptr) {
-            inorderWalk(node->m_left, out);
+            inOrderWalk(node->m_left, out);
             out << node->m_key << " ";
-            inorderWalk(node->m_right, out);
+            inOrderWalk(node->m_right, out);
         }
     }
     
@@ -143,35 +143,35 @@ int main() {
     tree.insert(node1);
     
     std::cout << "Nodo con chiave 3 inserito.\nChiavi in ordine: [ ";
-    tree.inorderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(tree.getRoot(), std::cout);
     std::cout << "].\n\n";
     
     auto node2 = std::make_shared<BinarySearchTree<int>::Node>(8);
     tree.insert(node2);
     
     std::cout << "Nodo con chiave 8 inserito.\nChiavi in ordine: [ ";
-    tree.inorderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(tree.getRoot(), std::cout);
     std::cout << "].\n\n";
     
     auto node3 = std::make_shared<BinarySearchTree<int>::Node>(4);
     tree.insert(node3);
     
     std::cout << "Nodo con chiave 4 inserito.\nChiavi in ordine: [ ";
-    tree.inorderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(tree.getRoot(), std::cout);
     std::cout << "].\n\n";
     
     auto node4 = std::make_shared<BinarySearchTree<int>::Node>(5);
     tree.insert(node4);
     
     std::cout << "Nodo con chiave 5 inserito.\nChiavi in ordine: [ ";
-    tree.inorderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(tree.getRoot(), std::cout);
     std::cout << "].\n\n";
 
     auto node5 = std::make_shared<BinarySearchTree<int>::Node>(1);
     tree.insert(node5);
     
     std::cout << "Nodo con chiave 1 inserito.\nChiavi in ordine: [ ";
-    tree.inorderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(tree.getRoot(), std::cout);
     std::cout << "].\n\n";
     
     std::cout << "L'elemento minimo e': " << tree.getMin()

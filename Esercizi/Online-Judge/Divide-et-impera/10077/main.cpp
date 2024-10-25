@@ -1,6 +1,6 @@
 // Bisogna attraversare un nodo per livello, e nel livello l-esimo si fa un 
 // inserimento in un vettore di dimensione 2 + l per cui, nel caso peggiore:
-// T(n) = sum_{i = 1}^(log(l) + 1) (2 + l).
+// T(n) = sum_{l = 1}^(log(l) + 1) (2 + l).
 // Facendo qualche conto, si ottiene una complessità O(log^2 n).
 #include <string>
 #include <iostream>
