@@ -19,10 +19,6 @@ bool operator==(const Fraction& lhs, const Fraction& rhs) {
 }
 
 bool operator>(const Fraction& lhs, const Fraction& rhs) {
-    if (lhs.d == 0) {
-        return true;
-    }
-    
     if (rhs.d == 0) {
         return false;
     }
