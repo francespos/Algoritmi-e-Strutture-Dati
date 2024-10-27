@@ -7,15 +7,15 @@
 #include <algorithm>
 
 struct Point {
-	float x, y;
+    float x, y;
 };
 
 constexpr float getSquare(float x) {
-	return x * x;
+    return x * x;
 }
 
 float getDistance(const Point& lhs, const Point& rhs) {
-	return std::sqrt(getSquare(lhs.x - rhs.x) + getSquare(lhs.y - rhs.y));
+    return std::sqrt(getSquare(lhs.x - rhs.x) + getSquare(lhs.y - rhs.y));
 }
 
 struct Outpost final : public Point { 
@@ -37,30 +37,30 @@ void setMinDistancesAndIndices(std::vector<float>& distances,
     int lastPos, float oldMin) 
 {
     if (firstPos < outposts.size() - 1) {
-		if (lastPos < outposts.size() && !(outposts[firstPos].hasASatellite && 
-		    outposts[lastPos].hasASatellite))
-		{
-		    const auto value = getDistance(outposts[firstPos], 
-		        outposts[lastPos]);
-		        
-		    auto min = oldMin;
+        if (lastPos < outposts.size() && !(outposts[firstPos].hasASatellite && 
+            outposts[lastPos].hasASatellite))
+        {
+            const auto value = getDistance(outposts[firstPos], 
+            outposts[lastPos]);
+
+            auto min = oldMin;
 
             if (value < oldMin) {
                 min = value;
                 lastPoss[firstPos] = lastPos;
             }
-            
-			setMinDistancesAndIndices(distances, lastPoss, outposts, firstPos, 
-			    lastPos + 1, min);
-		} else if (lastPos < outposts.size()) {
-		    setMinDistancesAndIndices(distances, lastPoss, outposts, firstPos, 
-		    lastPos + 1, 0);
-		} else {
-		    distances[firstPos] = oldMin;
-		    
-		    setMinDistancesAndIndices(distances, lastPoss, outposts, 
-		        firstPos + 1, firstPos + 2, INT_MAX);
-		}
+
+            setMinDistancesAndIndices(distances, lastPoss, outposts, firstPos, 
+                lastPos + 1, min);
+        } else if (lastPos < outposts.size()) {
+            setMinDistancesAndIndices(distances, lastPoss, outposts, firstPos, 
+            lastPos + 1, 0);
+        } else {
+            distances[firstPos] = oldMin;
+
+            setMinDistancesAndIndices(distances, lastPoss, outposts, 
+                firstPos + 1, firstPos + 2, INT_MAX);
+        }
     }
 }
 
