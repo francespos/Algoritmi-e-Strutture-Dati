@@ -1,5 +1,5 @@
 // La complessita' nel caso peggiore e' (n-1)(n-2)*...* 2 * k, cioe' 
-// O(k * n^(n - 2))
+// O(k * n!)
 #include <cmath>
 #include <iostream>
 #include <vector>
