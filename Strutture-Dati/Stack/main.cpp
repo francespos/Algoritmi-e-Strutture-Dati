@@ -1,68 +1,139 @@
-#include <array>
 #include <iostream>
+#include <memory>
 
-template<typename T, std::size_t N> requires (N != 0)
-class Stack {
-public:
-    Stack() noexcept : m_items{}, m_topPos(0), m_empty(true) {}
+namespace Dsa {
+    template<typename T>
+    class Stack {
+    private:
+        std::unique_ptr<T[]> m_items;
+        std::size_t m_maxLength;
+        
+        std::size_t m_topPos;
+        bool m_empty;
+    public:
+        class Iterator {
+        private:
+            T* m_ptr;
+        public:
+            explicit constexpr Iterator(T* ptr) noexcept : m_ptr(ptr) {}
+        
+            constexpr T& operator*() noexcept { 
+                return *m_ptr; 
+            }
+        
+            constexpr Iterator& operator++() noexcept {
+                ++m_ptr;
+                return *this;
+            }
+        
+            constexpr bool operator!=(const Iterator& other) const noexcept {
+                return m_ptr != other.m_ptr;
+            }
+        
+            constexpr bool operator==(const Iterator& other) const noexcept {
+                return m_ptr == other.m_ptr;
+            }
+        };
+        
+        class ConstIterator {
+        private:
+            const T* m_ptr;
+        public:
+            explicit constexpr ConstIterator(const T* ptr) noexcept : m_ptr(ptr)
+            {}
+        
+            constexpr const T& operator*() const noexcept { 
+                return *m_ptr; 
+            }
+        
+            constexpr ConstIterator& operator++() noexcept {
+                ++m_ptr;
+                return *this;
+            }
+        
+            constexpr bool operator!=(const Iterator& other) const noexcept {
+                return m_ptr != other.m_ptr;
+            }
+        
+            constexpr bool operator==(const Iterator& other) const noexcept {
+                return m_ptr == other.m_ptr;
+            }
+        };
     
-    constexpr std::size_t getMaxLength() const noexcept {
-        return N;
-    }
-    
-    std::size_t getLength() const noexcept {
-        if (m_empty) { 
-            return 0;
+        constexpr explicit Stack(std::size_t maxLength) 
+            : m_items(std::make_unique<T[]>(maxLength)), m_maxLength(maxLength)
+            , m_topPos(0), m_empty(true) {}
+            
+        constexpr std::size_t getMaxLength() const noexcept {
+            return m_maxLength;
         }
         
-        return m_topPos;
-    }
-
-    bool isEmpty() const noexcept {
-        return m_empty; 
-    }
-    
-    bool isFull() const noexcept {
-        return m_topPos == N;
-    }
-    
-    T& getTop() {
-        if (isEmpty()) {
-            throw std::out_of_range("stack is empty.");
-        }
-        return m_items[m_topPos - 1];
-    }
-    
-    void push(const T& item) {
-        if (isFull()) {
-            throw std::out_of_range("stack is full.");
+        constexpr std::size_t getLength() const noexcept {
+            if (m_empty) { 
+                return 0;
+            }
+            
+            return m_topPos;
         }
         
-        m_items[m_topPos++] = item;
-        m_empty = false;
-    }
+        constexpr Iterator begin() { 
+            return Iterator(m_items.get()); 
+        }
+        
+        constexpr ConstIterator begin() const { 
+            return Iterator(m_items.get()); 
+        }
+        
+        constexpr Iterator end() { 
+            return Iterator(m_items.get() + m_topPos); 
+        }
+        
+        constexpr ConstIterator end() const { 
+            return Iterator(m_items.get() + m_topPos); 
+        }
     
-    [[nodiscard]] T& pop() {
-        if (isEmpty()) {
-            throw std::out_of_range("stack is empty.");
+        constexpr bool isEmpty() const noexcept {
+            return m_empty; 
         }
         
-        --m_topPos;
-        
-        if (m_topPos == 0) {
-            m_empty = true;
+        constexpr bool isFull() const noexcept {
+            return m_topPos == m_maxLength;
         }
         
-        return m_items[m_topPos];
-    }
-private:
-    std::array<T, N> m_items;
-    std::size_t m_topPos;
-    bool m_empty;
-};
+        constexpr T& getTop() {
+            if (Stack::isEmpty()) {
+                throw std::out_of_range("stack is empty");
+            }
+            return m_items[m_topPos - 1];
+        }
+        
+        constexpr void push(const T& item) {
+            if (Stack::isFull()) {
+                throw std::out_of_range("stack is full");
+            }
+            
+            m_items[m_topPos++] = item;
+            m_empty = false;
+        }
+        
+        [[nodiscard]] constexpr T& pop() {
+            if (Stack::isEmpty()) {
+                throw std::out_of_range("stack is empty");
+            }
+            
+            --m_topPos;
+            
+            if (m_topPos == 0) {
+                m_empty = true;
+            }
+            
+            return m_items[m_topPos];
+        }
+    };
+}
 
 int main() {
-    Stack<int, 3> s;
+    Dsa::Stack<int> s(3);
     
     std::cout << "Stack length: " << s.getLength() << "\nStack max length: " 
         << s.getMaxLength() << "\n\n";
@@ -83,6 +154,14 @@ int main() {
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
+    
+    std::cout << "Verifico se funzionano gli iteratori; elementi nello stack: ";
+    
+    for (auto elem : s) {
+        std::cout << elem << " ";
+    }
+    
+    std::cout << "\n\n";
     
     try {
         for (std::size_t i = 0; i < 4; ++i) {

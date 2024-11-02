@@ -2,18 +2,21 @@
 #include <vector>
 #include <string_view>
 
-template<class RandomIt, class Compare = std::less<>>
-constexpr void sort(RandomIt first, RandomIt last, Compare comp = Compare()) {
-    for (auto it1 = first + 1; it1 < last; ++it1) {
-        auto key = *it1;
-        auto it2 = it1;
-        
-        while (it2 > first && comp(key, *(it2 - 1))) {
-            *it2 = *(it2 - 1);
-            --it2;
+namespace Dsa {
+    template<class RandomIt, class Compare = std::less<>>
+    constexpr void sort(RandomIt first, RandomIt last, Compare comp = Compare()) 
+    {
+        for (auto it1 = first + 1; it1 != last; ++it1) {
+            auto key = *it1;
+            auto it2 = it1;
+            
+            while (it2 != first && comp(key, *(it2 - 1))) {
+                *it2 = *(it2 - 1);
+                --it2;
+            }
+            
+            *it2 = key; 
         }
-        
-        *it2 = key; 
     }
 }
 
@@ -42,12 +45,12 @@ int main() {
         std::cout << "\n";
     };
     
-    sort(v.begin(), v.end());
+    Dsa::sort(v.begin(), v.end());
     printV("Elementi ordinati con comparatore standard");
     
-    sort(v.begin(), v.end(), customLess);
+    Dsa::sort(v.begin(), v.end(), customLess);
     printV("Elementi ordinati con comparatore customLess");
     
-    sort(v.begin(), v.end(), customBigger);
+    Dsa::sort(v.begin(), v.end(), customBigger);
     printV("Elementi ordinati con comparatore customBigger");
 }
