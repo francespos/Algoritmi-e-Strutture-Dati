@@ -5,195 +5,181 @@
 #include <type_traits>
 #include <stdexcept>
 
-template<typename T>
-concept Printable = requires(std::ostream& out, T t) {
-    {out << t} -> std::same_as<std::ostream&>;
-};
-
-template<typename T>
-concept PrintableAndOrdered = Printable<T> && std::totally_ordered<T>;
-
-template<PrintableAndOrdered Key>
-class BinarySearchTree {
-public:
-    class Node {
-    public:
-        friend class BinarySearchTree;
-    
-        Node(const Key& key) noexcept 
-            : m_key(key), m_parent(nullptr), m_left(nullptr), m_right(nullptr) 
-        {}
+namespace Dsa {
+    template<typename Key>
+    class BinarySearchTree {
     private:
-        Key m_key;
-        std::shared_ptr<Node> m_parent, m_left, m_right;
-    };
+        class Node {
+        private:
+            Key m_key;
+            std::shared_ptr<Node> m_parent, m_left, m_right;
+        public:
+            friend class BinarySearchTree;
+        
+            constexpr explicit Node(const Key& key) noexcept 
+                : m_key(key), m_parent(nullptr), m_left(nullptr)
+                , m_right(nullptr) {}
+        };
+        
+        class ConstIterator {
+        private:
+            const Node* m_ptr;
+        public:
+            constexpr explicit ConstIterator(const Node* ptr) noexcept : 
+                m_ptr(ptr) {}
+            
+            constexpr const Key& operator*() const noexcept {
+                return m_ptr->m_key;
+            }
+        };
     
-    BinarySearchTree() noexcept : m_root(nullptr) {}
-    
-    std::shared_ptr<const Node> getRoot() const noexcept {
-        return std::const_pointer_cast<const Node>(m_root);
-    }
-    
-    bool isEmpty() const noexcept {
-        return m_root == nullptr;
-    }
-    
-    void inOrderWalk(std::shared_ptr<const Node> node, std::ostream& out) const 
-        noexcept 
-    {
-        if (node != nullptr) {
-            inOrderWalk(node->m_left, out);
-            out << node->m_key << " ";
-            inOrderWalk(node->m_right, out);
-        }
-    }
-    
-    std::shared_ptr<const Node> find(std::shared_ptr<const Node> node, 
-        const Key& key) const noexcept 
-    {
-        if (node == nullptr || key == node->m_key) {
-            return std::const_pointer_cast<const Node>(node);
+        constexpr void inOrderWalk(std::shared_ptr<const Node> node, 
+            std::ostream& out) const noexcept 
+        {
+            if (node != nullptr) {
+                Dsa::BinarySearchTree<Key>::inOrderWalk(node->m_left, out);
+                out << node->m_key << " ";
+                Dsa::BinarySearchTree<Key>::inOrderWalk(node->m_right, out);
+            }
         }
         
-        if (key < node->m_key) {
-            return find(node->m_left, key);
-        } else {
-            return find(node->m_right, key);
-        }
-    }
-    
-    std::shared_ptr<const Node> find(const Key& key) const noexcept {
-        auto node = m_root;
-        
-        while (node != nullptr && key != node->m_key) {
+        constexpr ConstIterator find(std::shared_ptr<const Node> node, 
+            const Key& key) const noexcept 
+        {
+            if (node == nullptr || key == node->m_key) {
+                return Dsa::BinarySearchTree<Key>::ConstIterator(node);
+            }
+            
             if (key < node->m_key) {
-                node = node->m_left;
+                return Dsa::BinarySearchTree<Key>::find(node->m_left, key);
             } else {
+                return Dsa::BinarySearchTree<Key>::find(node->m_right, key);
+            }
+        }
+        
+        std::shared_ptr<Node> m_root;
+    public:
+        constexpr explicit BinarySearchTree() noexcept : m_root(nullptr) {}
+        
+        constexpr const Key& getRoot() const noexcept {
+            return m_root->m_key;
+        }
+        
+        constexpr bool isEmpty() const noexcept {
+            return m_root == nullptr;
+        }
+        
+        constexpr void inOrderWalk(std::ostream& out) const noexcept {
+            Dsa::BinarySearchTree<Key>::inOrderWalk(m_root, out);    
+        }
+        
+        constexpr ConstIterator find(const Key& key) const noexcept {
+            auto node = m_root;
+            
+            while (node != nullptr && key != node->m_key) {
+                if (key < node->m_key) {
+                    node = node->m_left;
+                } else {
+                    node = node->m_right;
+                }
+            }
+            
+            return Dsa::BinarySearchTree<Key>::ConstIterator(node.get());
+        }
+        
+        constexpr const Key& getMin() const {
+            if (isEmpty()) {
+                throw std::runtime_error("tree is empty.");
+            }    
+        
+            auto node = m_root;
+            
+            while (node->m_left != nullptr) {
+                node = node->m_left;
+            }
+            
+            return node->m_key;
+        }
+        
+        constexpr const Key& getMax() const {
+            if (isEmpty()) {
+                throw std::runtime_error("tree is empty.");
+            }    
+        
+            auto node = m_root;
+            
+            while (node->m_right != nullptr) {
                 node = node->m_right;
             }
-        }
-        
-        return std::const_pointer_cast<const Node>(node);
-    }
-    
-    const Key& getMin() const {
-        if (isEmpty()) {
-            throw std::runtime_error("tree is empty.");
-        }    
-    
-        auto node = m_root;
-        
-        while (node->m_left != nullptr) {
-            node = node->m_left;
-        }
-        
-        return node->m_key;
-    }
-    
-    const Key& getMax() const {
-        if (isEmpty()) {
-            throw std::runtime_error("tree is empty.");
-        }    
-    
-        auto node = m_root;
-        
-        while (node->m_right != nullptr) {
-            node = node->m_right;
-        }
-        
-        return node->m_key;
-    }
-    
-    void insert(std::shared_ptr<Node> node) {
-        if (node == nullptr) {
-            throw std::runtime_error("cannot insert a nullptr.");
-        }
-        
-        std::shared_ptr<Node> parent = nullptr;
-        auto child = m_root;
-        
-        while (child != nullptr) {
-            parent = child;
             
-            if (node->m_key < child->m_key) {
-                child = child->m_left;
+            return node->m_key;
+        }
+        
+        constexpr void insert(const Key& key) {
+            auto node = std::make_shared<Node>(key);
+            
+            std::shared_ptr<Node> parent = nullptr;
+            auto child = m_root;
+            
+            while (child != nullptr) {
+                parent = child;
+                
+                if (node->m_key < child->m_key) {
+                    child = child->m_left;
+                } else {
+                    child = child->m_right;
+                }
+            }
+            
+            node->m_parent = parent;
+            
+            if (parent == nullptr) {
+                m_root = node;
+            } else if (node->m_key < parent->m_key) {
+                parent->m_left = node;
             } else {
-                child = child->m_right;
+                parent->m_right = node;
             }
         }
-        
-        node->m_parent = parent;
-        
-        if (parent == nullptr) {
-            m_root = node;
-        } else if (node->m_key < parent->m_key) {
-            parent->m_left = node;
-        } else {
-            parent->m_right = node;
-        }
-    }
-private:
-    std::shared_ptr<Node> m_root;
-};
+    };
+}
 
 int main() {
-    BinarySearchTree<int> tree;
+    Dsa::BinarySearchTree<int> tree;
     
-    auto node1 = std::make_shared<BinarySearchTree<int>::Node>(3);
-    tree.insert(node1);
+    tree.insert(3);
     
     std::cout << "Nodo con chiave 3 inserito.\nChiavi in ordine: [ ";
-    tree.inOrderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(std::cout);
     std::cout << "].\n\n";
     
-    auto node2 = std::make_shared<BinarySearchTree<int>::Node>(8);
-    tree.insert(node2);
+    tree.insert(8);
     
     std::cout << "Nodo con chiave 8 inserito.\nChiavi in ordine: [ ";
-    tree.inOrderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(std::cout);
     std::cout << "].\n\n";
     
-    auto node3 = std::make_shared<BinarySearchTree<int>::Node>(4);
-    tree.insert(node3);
+    tree.insert(4);
     
     std::cout << "Nodo con chiave 4 inserito.\nChiavi in ordine: [ ";
-    tree.inOrderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(std::cout);
     std::cout << "].\n\n";
     
-    auto node4 = std::make_shared<BinarySearchTree<int>::Node>(5);
-    tree.insert(node4);
+    tree.insert(5);
     
     std::cout << "Nodo con chiave 5 inserito.\nChiavi in ordine: [ ";
-    tree.inOrderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(std::cout);
     std::cout << "].\n\n";
 
-    auto node5 = std::make_shared<BinarySearchTree<int>::Node>(1);
-    tree.insert(node5);
+    tree.insert(1);
     
     std::cout << "Nodo con chiave 1 inserito.\nChiavi in ordine: [ ";
-    tree.inOrderWalk(tree.getRoot(), std::cout);
+    tree.inOrderWalk(std::cout);
     std::cout << "].\n\n";
     
     std::cout << "L'elemento minimo e': " << tree.getMin()
         << "\nL'elemento massimo e': " << tree.getMax() << ".\n\n";
     
-    std::cout << "Cerco il nodo con chiave 4 con la ricerca ricorsiva.\n"
-        << "Nodo con chiave 4 " 
-        << (tree.find(tree.getRoot(), 4) != nullptr ? "trovato" 
-            : "non trovato") << ".\n\n";
-            
-    std::cout << "Cerco il nodo con chiave 9 con la ricerca ricorsiva.\n"
-        << "Nodo con chiave 9 " 
-        << (tree.find(tree.getRoot(), 9) != nullptr ? "trovato" 
-            : "non trovato") << ".\n\n";
-            
-    std::cout << "Cerco il nodo con chiave 4 con la ricerca iterativa.\n"
-        << "Nodo con chiave 4 " 
-        << (tree.find(4) != nullptr ? "trovato" 
-            : "non trovato") << ".\n\n";
-            
-    std::cout << "Cerco il nodo con chiave 9 con la ricerca iterativa.\n"
-        << "Nodo con chiave 9 " 
-        << (tree.find(9) != nullptr ? "trovato" 
-            : "non trovato") << ".\n\n";
+    std::cout << "Cerco il nodo con chiave 4.\n"
+        << "Chiave: " << *tree.find(4) << ".\n\n";
 }

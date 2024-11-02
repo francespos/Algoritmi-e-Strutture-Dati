@@ -2,185 +2,215 @@
 #include <iostream>
 #include <stdexcept>
 
-template<typename T>
-class List {
-public:
-    class Node {
-    public:
-        friend class List;
-        
-        Node(const T& value) noexcept 
-            : m_value(value), m_prev(nullptr), m_next(nullptr) {}
-            
-        const T& getValue() const noexcept {
-            return m_value;
-        }
+namespace Dsa {
+    template<typename T>
+    class List {
     private:
-        T m_value;
-        std::shared_ptr<Node> m_prev, m_next;
+        class Node {
+        public:
+            friend class List;
+            
+            constexpr explicit Node(const T& value) noexcept 
+                : m_value(value), m_prev(nullptr), m_next(nullptr) {}
+                
+            constexpr const T& getValue() const noexcept {
+                return m_value;
+            }
+        private:
+            T m_value;
+            std::shared_ptr<Node> m_prev, m_next;
+        };
+    
+        std::shared_ptr<Node> m_head;
+    public:
+        class Iterator {
+        private:
+            Node* m_ptr;
+        public:
+            explicit constexpr Iterator(Node* ptr) noexcept : m_ptr(ptr) {}
+        
+            constexpr T& operator*() noexcept { 
+                return m_ptr->m_value; 
+            }
+        
+            constexpr Iterator& operator++() noexcept {
+                m_ptr = m_ptr->m_next.get();
+                return *this;
+            }
+        
+            constexpr bool operator!=(const Iterator& other) const noexcept {
+                return m_ptr != other.m_ptr;
+            }
+        
+            constexpr bool operator==(const Iterator& other) const noexcept {
+                return m_ptr == other.m_ptr;
+            }
+        };
+        
+        class ConstIterator {
+        private:
+            const Node* m_ptr;
+        public:
+            explicit constexpr ConstIterator(const Node* ptr) noexcept 
+                : m_ptr(ptr) {}
+        
+            constexpr const T& operator*() const noexcept { 
+                return m_ptr->m_value; 
+            }
+        
+            constexpr ConstIterator& operator++() noexcept {
+                m_ptr = m_ptr->m_next.get();
+                return *this;
+            }
+        
+            constexpr bool operator!=(const Iterator& other) const noexcept {
+                return m_ptr != other.m_ptr;
+            }
+        
+            constexpr bool operator==(const Iterator& other) const noexcept {
+                return m_ptr == other.m_ptr;
+            }
+        };
+        
+        constexpr List() {
+            std::shared_ptr<Node> node = std::make_shared<Node>(T());
+            node->m_prev = node->m_next = node;
+            m_head = node;
+        }
+        
+        constexpr std::size_t getLength() const noexcept {
+            std::size_t length = 0;
+            
+            for (auto node = m_head->m_next; node != m_head; 
+                node = node->m_next) 
+            {
+                ++length;
+            }
+            
+            return length;
+        }
+        
+        constexpr Iterator begin() noexcept {
+            return Iterator(m_head->m_next.get());
+        }
+        
+        constexpr Iterator end() noexcept {
+            return Iterator(m_head.get());
+        }
+        
+        constexpr ConstIterator begin() const noexcept {
+            return ConstIterator(m_head->m_next.get());
+        }
+        
+        constexpr ConstIterator end() const noexcept {
+            return ConstIterator(m_head.get());
+        }
+        
+        constexpr const T& getHead() const {
+            return m_head->m_next->m_value;
+        }
+        
+        constexpr const T& operator[](std::size_t pos) const {
+            auto node = m_head->m_next;
+            std::size_t i = 0;
+            
+            while (node != m_head && i < pos) {
+                node = node->m_next;
+                ++i;
+            }
+            
+            return node->m_value;
+        }
+        
+        constexpr const T& get(std::size_t pos) const {
+            if (pos >= Dsa::List<T>::getLength()) {
+                throw std::out_of_range("index is too big");
+            }
+            
+            return Dsa::List<T>::operator[](pos);
+        }
+    
+        constexpr ConstIterator find(const T& value) const {
+            auto node = m_head->m_next;
+    
+            while (node != m_head && node->m_value != value) {
+                node = node->m_next;
+            }
+            
+            return Dsa::List<T>::ConstIterator(node.get());
+        }
+        
+        constexpr void insert(const T& value) {
+            auto node = std::make_shared<Node>(value);
+            
+            node->m_next = m_head->m_next;
+            m_head->m_next->m_prev = node;
+            node->m_prev = m_head;
+            m_head->m_next = node;
+        }
+        
+        constexpr void remove(const T& value) {
+            auto node = m_head->m_next;
+            
+            while (node != m_head && node->m_value != value) {
+                node = node->m_next;
+            }
+            
+            if (node == m_head) {
+                return;
+            }
+            
+            node->m_prev->m_next = node->m_next;
+            node->m_next->m_prev = node->m_prev;
+        }
     };
-    
-    List() {
-        std::shared_ptr<Node> node = std::make_shared<Node>(0);
-        node->m_prev = node->m_next = node;
-        m_head = node;
-    }
-    
-    std::size_t getLength() const noexcept {
-        std::size_t length = 0;
-        
-        for (auto node = m_head->m_next; node != m_head; node = node->m_next) {
-            ++length;
-        }
-        
-        return length;
-    }
-    
-    std::shared_ptr<const Node> getHead() const noexcept {
-        auto node = m_head->m_next;
-        
-        if (node == m_head) {
-            return nullptr;
-        }
-        
-        return std::const_pointer_cast<const Node>(node);
-    }
-    
-    std::shared_ptr<const Node> operator[](std::size_t pos) const noexcept {
-        auto node = m_head->m_next;
-        std::size_t i = 0;
-        
-        while (node != m_head && i < pos) {
-            node = node->m_next;
-            ++i;
-        }
-        
-        if (node == m_head && i == pos) {
-            return nullptr;
-        }
-        
-        return std::const_pointer_cast<const Node>(node);
-    }
-    
-    std::shared_ptr<const Node> get(std::size_t pos) const {
-        auto node = operator[](pos);
-        
-        if (node == nullptr && m_head != m_head->m_next) {
-            throw std::out_of_range("index is too big.");
-        }
-        
-        return node;
-    }
-
-    std::shared_ptr<const Node> find(const T& value) const {
-        auto node = m_head->m_next;
-
-        while (node != m_head && node->m_value != value) {
-            node = node->m_next;
-        }
-        
-        if (node == m_head) {
-            return nullptr;
-        }
-
-        return std::const_pointer_cast<const Node>(node);
-    }
-    
-    void insert(std::shared_ptr<Node> node) {
-        if (node == nullptr) {
-            throw std::invalid_argument("argument is a nullptr.");
-        }
-        
-        node->m_next = m_head->m_next;
-        m_head->m_next->m_prev = node;
-        node->m_prev = m_head;
-        m_head->m_next = node;
-    }
-    
-    void remove(std::shared_ptr<const Node> node) {
-        if (node == nullptr) {
-            throw std::invalid_argument("argument is a nullptr.");
-        }
-        
-        node->m_prev->m_next = node->m_next;
-        node->m_next->m_prev = node->m_prev;
-    }
-private:
-    std::shared_ptr<Node> m_head;
-};
+}
 
 int main() {
-    List<int> l;
+    Dsa::List<int> l;
     std::cout << "List length: " << l.getLength() << "\n\n";
     
-    auto node1 = std::make_shared<List<int>::Node>(1);
-    
-    l.insert(node1);
+    l.insert(1);
     std::cout << "Node with value 1 inserted.\n"
-        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
+        << "Value of head: " << l.getHead() << "\n\n"; 
     
     std::cout << "List length: " << l.getLength() << "\n\n";
     
-    auto node2 = std::make_shared<List<int>::Node>(2);
-    
-    l.insert(node2);
+    l.insert(2);
     std::cout << "Node with value 2 inserted.\n"
-        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
+        << "Value of head: " << l.getHead() << "\n\n"; 
         
     std::cout << "List length: " << l.getLength() << "\n\n";
     
-    auto node3 = std::make_shared<List<int>::Node>(3);
-    
-    l.insert(node3);
+    l.insert(3);
     std::cout << "Node with value 3 inserted.\n"
-        << "Value of head: " << l.getHead()->getValue() << "\n\n"; 
+        << "Value of head: " << l.getHead() << "\n\n"; 
         
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
-    for (std::size_t i = 0; i < 3; ++i) {
-        std::cout << l[i]->getValue() << " ";
+    for (auto elem : l) {
+        std::cout << elem << " ";
     }
     std::cout << "]\n\n";
     
     try {
-        std::cout << "List fourth element: " << l.get(3)->getValue() << "\n\n";
+        std::cout << "List fourth element: " << l.get(3) << "\n\n";
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
     }
     
     std::cout << "Find node with value 2.\n";
-    if (l.find(2) != nullptr) {
-        std::cout << "Node found.\n\n";
-    }
+    std::cout << "Node = " << *l.find(2) << "\n\n";
     
-    l.remove(node2);
+    l.remove(2);
     std::cout << "Node 2 removed.\n";
     
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     std::cout << "List = [ ";
-    for (std::size_t i = 0; i < 2; ++i) {
-        std::cout << l[i]->getValue() << " ";
+    for (auto elem : l) {
+        std::cout << elem << " ";
     }
     std::cout << "]\n\n";
-
-    std::cout << "Find node with value 2.\n";
-    if (l.find(2) == nullptr) {
-        std::cout << "Node not found.\n\n";
-    }
-
-    try {
-        std::cout << "Inserting a nullptr.\n";
-        l.insert(nullptr);
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl << std::endl;
-    }
-    
-    try {
-        std::cout << "Removing a nullptr.\n";
-        l.remove(nullptr);
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl << std::endl;
-    }
 }

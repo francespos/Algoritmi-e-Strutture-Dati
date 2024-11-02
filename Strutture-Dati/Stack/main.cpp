@@ -76,19 +76,19 @@ namespace Dsa {
             return m_topPos;
         }
         
-        constexpr Iterator begin() { 
+        constexpr Iterator begin() noexcept { 
             return Iterator(m_items.get()); 
         }
         
-        constexpr ConstIterator begin() const { 
+        constexpr ConstIterator begin() const noexcept { 
             return Iterator(m_items.get()); 
         }
         
-        constexpr Iterator end() { 
+        constexpr Iterator end() noexcept { 
             return Iterator(m_items.get() + m_topPos); 
         }
         
-        constexpr ConstIterator end() const { 
+        constexpr ConstIterator end() const noexcept { 
             return Iterator(m_items.get() + m_topPos); 
         }
     
@@ -99,7 +99,7 @@ namespace Dsa {
         constexpr bool isFull() const noexcept {
             return m_topPos == m_maxLength;
         }
-        
+
         constexpr T& getTop() {
             if (Stack::isEmpty()) {
                 throw std::out_of_range("stack is empty");
