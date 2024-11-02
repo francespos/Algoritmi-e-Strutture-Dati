@@ -2,172 +2,170 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace Dsa {
-    template<typename T>
-    class List {
-    private:
-        class Node {
-        public:
-            friend class List;
-            
-            constexpr explicit Node(const T& value) noexcept 
-                : m_value(value), m_prev(nullptr), m_next(nullptr) {}
-                
-            constexpr const T& getValue() const noexcept {
-                return m_value;
-            }
-        private:
-            T m_value;
-            std::shared_ptr<Node> m_prev, m_next;
-        };
-    
-        std::shared_ptr<Node> m_head;
+template<typename T>
+class List {
+private:
+    class Node {
     public:
-        class Iterator {
-        private:
-            Node* m_ptr;
-        public:
-            explicit constexpr Iterator(Node* ptr) noexcept : m_ptr(ptr) {}
+        friend class List;
         
-            constexpr T& operator*() noexcept { 
-                return m_ptr->m_value; 
-            }
-        
-            constexpr Iterator& operator++() noexcept {
-                m_ptr = m_ptr->m_next.get();
-                return *this;
-            }
-        
-            constexpr bool operator!=(const Iterator& other) const noexcept {
-                return m_ptr != other.m_ptr;
-            }
-        
-            constexpr bool operator==(const Iterator& other) const noexcept {
-                return m_ptr == other.m_ptr;
-            }
-        };
-        
-        class ConstIterator {
-        private:
-            const Node* m_ptr;
-        public:
-            explicit constexpr ConstIterator(const Node* ptr) noexcept 
-                : m_ptr(ptr) {}
-        
-            constexpr const T& operator*() const noexcept { 
-                return m_ptr->m_value; 
-            }
-        
-            constexpr ConstIterator& operator++() noexcept {
-                m_ptr = m_ptr->m_next.get();
-                return *this;
-            }
-        
-            constexpr bool operator!=(const Iterator& other) const noexcept {
-                return m_ptr != other.m_ptr;
-            }
-        
-            constexpr bool operator==(const Iterator& other) const noexcept {
-                return m_ptr == other.m_ptr;
-            }
-        };
-        
-        constexpr List() {
-            std::shared_ptr<Node> node = std::make_shared<Node>(T());
-            node->m_prev = node->m_next = node;
-            m_head = node;
-        }
-        
-        constexpr std::size_t getLength() const noexcept {
-            std::size_t length = 0;
+        constexpr explicit Node(const T& value) noexcept 
+            : m_value(value), m_prev(nullptr), m_next(nullptr) {}
             
-            for (auto node = m_head->m_next; node != m_head; 
-                node = node->m_next) 
-            {
-                ++length;
-            }
-            
-            return length;
+        constexpr const T& getValue() const noexcept {
+            return m_value;
         }
-        
-        constexpr Iterator begin() noexcept {
-            return Iterator(m_head->m_next.get());
-        }
-        
-        constexpr Iterator end() noexcept {
-            return Iterator(m_head.get());
-        }
-        
-        constexpr ConstIterator begin() const noexcept {
-            return ConstIterator(m_head->m_next.get());
-        }
-        
-        constexpr ConstIterator end() const noexcept {
-            return ConstIterator(m_head.get());
-        }
-        
-        constexpr const T& getHead() const {
-            return m_head->m_next->m_value;
-        }
-        
-        constexpr const T& operator[](std::size_t pos) const {
-            auto node = m_head->m_next;
-            std::size_t i = 0;
-            
-            while (node != m_head && i < pos) {
-                node = node->m_next;
-                ++i;
-            }
-            
-            return node->m_value;
-        }
-        
-        constexpr const T& get(std::size_t pos) const {
-            if (pos >= Dsa::List<T>::getLength()) {
-                throw std::out_of_range("index is too big");
-            }
-            
-            return Dsa::List<T>::operator[](pos);
+    private:
+        T m_value;
+        std::shared_ptr<Node> m_prev, m_next;
+    };
+
+    std::shared_ptr<Node> m_head;
+public:
+    class Iterator {
+    private:
+        Node* m_ptr;
+    public:
+        constexpr explicit Iterator(Node* ptr) noexcept : m_ptr(ptr) {}
+    
+        constexpr T& operator*() noexcept { 
+            return m_ptr->m_value; 
         }
     
-        constexpr ConstIterator find(const T& value) const {
-            auto node = m_head->m_next;
+        constexpr Iterator& operator++() noexcept {
+            m_ptr = m_ptr->m_next.get();
+            return *this;
+        }
     
-            while (node != m_head && node->m_value != value) {
-                node = node->m_next;
-            }
-            
-            return Dsa::List<T>::ConstIterator(node.get());
+        constexpr bool operator!=(const Iterator& other) const noexcept {
+            return m_ptr != other.m_ptr;
         }
-        
-        constexpr void insert(const T& value) {
-            auto node = std::make_shared<Node>(value);
-            
-            node->m_next = m_head->m_next;
-            m_head->m_next->m_prev = node;
-            node->m_prev = m_head;
-            m_head->m_next = node;
-        }
-        
-        constexpr void remove(const T& value) {
-            auto node = m_head->m_next;
-            
-            while (node != m_head && node->m_value != value) {
-                node = node->m_next;
-            }
-            
-            if (node == m_head) {
-                return;
-            }
-            
-            node->m_prev->m_next = node->m_next;
-            node->m_next->m_prev = node->m_prev;
+    
+        constexpr bool operator==(const Iterator& other) const noexcept {
+            return m_ptr == other.m_ptr;
         }
     };
-}
+    
+    class ConstIterator {
+    private:
+        const Node* m_ptr;
+    public:
+        constexpr explicit ConstIterator(const Node* ptr) noexcept 
+            : m_ptr(ptr) {}
+    
+        constexpr const T& operator*() const noexcept { 
+            return m_ptr->m_value; 
+        }
+    
+        constexpr ConstIterator& operator++() noexcept {
+            m_ptr = m_ptr->m_next.get();
+            return *this;
+        }
+    
+        constexpr bool operator!=(const Iterator& other) const noexcept {
+            return m_ptr != other.m_ptr;
+        }
+    
+        constexpr bool operator==(const Iterator& other) const noexcept {
+            return m_ptr == other.m_ptr;
+        }
+    };
+    
+    constexpr List() {
+        std::shared_ptr<Node> node = std::make_shared<Node>(T());
+        node->m_prev = node->m_next = node;
+        m_head = node;
+    }
+    
+    constexpr std::size_t getLength() const noexcept {
+        std::size_t length = 0;
+        
+        for (auto node = m_head->m_next; node != m_head; 
+            node = node->m_next) 
+        {
+            ++length;
+        }
+        
+        return length;
+    }
+    
+    constexpr Iterator begin() noexcept {
+        return Iterator(m_head->m_next.get());
+    }
+    
+    constexpr Iterator end() noexcept {
+        return Iterator(m_head.get());
+    }
+    
+    constexpr ConstIterator begin() const noexcept {
+        return ConstIterator(m_head->m_next.get());
+    }
+    
+    constexpr ConstIterator end() const noexcept {
+        return ConstIterator(m_head.get());
+    }
+    
+    constexpr const T& getHead() const {
+        return m_head->m_next->m_value;
+    }
+    
+    constexpr const T& operator[](std::size_t pos) const {
+        auto node = m_head->m_next;
+        std::size_t i = 0;
+        
+        while (node != m_head && i < pos) {
+            node = node->m_next;
+            ++i;
+        }
+        
+        return node->m_value;
+    }
+    
+    constexpr const T& get(std::size_t pos) const {
+        if (pos >= getLength()) {
+            throw std::out_of_range("index is too big");
+        }
+        
+        return operator[](pos);
+    }
+
+    constexpr ConstIterator find(const T& value) const {
+        auto node = m_head->m_next;
+
+        while (node != m_head && node->m_value != value) {
+            node = node->m_next;
+        }
+        
+        return ConstIterator(node.get());
+    }
+    
+    constexpr void insert(const T& value) {
+        auto node = std::make_shared<Node>(value);
+        
+        node->m_next = m_head->m_next;
+        m_head->m_next->m_prev = node;
+        node->m_prev = m_head;
+        m_head->m_next = node;
+    }
+    
+    constexpr void remove(const T& value) {
+        auto node = m_head->m_next;
+        
+        while (node != m_head && node->m_value != value) {
+            node = node->m_next;
+        }
+        
+        if (node == m_head) {
+            return;
+        }
+        
+        node->m_prev->m_next = node->m_next;
+        node->m_next->m_prev = node->m_prev;
+    }
+};
 
 int main() {
-    Dsa::List<int> l;
+    List<int> l;
     std::cout << "List length: " << l.getLength() << "\n\n";
     
     l.insert(1);
