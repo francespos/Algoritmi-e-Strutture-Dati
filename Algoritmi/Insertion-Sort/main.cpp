@@ -1,27 +1,53 @@
-#include <concepts>
 #include <iostream>
 #include <vector>
+#include <string_view>
 
-template<typename T> requires std::totally_ordered<T>
-void sort(std::vector<T>& v) noexcept {
-    for (std::size_t i = 1; i < v.size(); ++i) {
-        const auto key = v[i];
-        auto j = i;
-
-        while (j > 0 && v[j - 1] > key) {
-            v[j] = v[j - 1];
-            --j;
+template<class RandomIt, class Compare = std::less<>>
+constexpr void sort(RandomIt first, RandomIt last, Compare comp = Compare()) {
+    for (auto it1 = first + 1; it1 < last; ++it1) {
+        auto key = *it1;
+        auto it2 = it1;
+        
+        while (it2 > first && comp(key, *(it2 - 1))) {
+            *it2 = *(it2 - 1);
+            --it2;
         }
-
-        v[j] = key;
+        
+        *it2 = key; 
     }
 }
 
 int main() {
-    std::vector<int> v{5, 2, 4, 6, 1, 3};
-    sort(v);
-
-    for (auto elem : v) {
-        std::cout << elem << " ";
-    }
+    struct {
+        constexpr bool operator()(int a, int b) const {
+            return a < b;    
+        }
+    } customLess;
+    
+    struct {
+        constexpr bool operator()(int a, int b) const {
+            return a > b;    
+        }
+    } customBigger;
+    
+    std::vector<int> v{5, 2, 4, 6, 4, 1, 3};
+    
+    auto printV = [&v](std::string_view message) {
+        std::cout << message << ": ";
+        
+        for (auto elem : v) {
+            std::cout << elem << " ";
+        }
+        
+        std::cout << "\n";
+    };
+    
+    sort(v.begin(), v.end());
+    printV("Elementi ordinati con comparatore standard");
+    
+    sort(v.begin(), v.end(), customLess);
+    printV("Elementi ordinati con comparatore customLess");
+    
+    sort(v.begin(), v.end(), customBigger);
+    printV("Elementi ordinati con comparatore customBigger");
 }
