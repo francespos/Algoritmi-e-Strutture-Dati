@@ -1,7 +1,16 @@
+/*
+Input:
+5 7
+878 323
+1 1
+Output:
+LRRL
+RRLRRLRLLLLRLRRR
+*/
 // Bisogna attraversare un nodo per livello, e nel livello l-esimo si fa un 
 // inserimento in un vettore di dimensione 2 + l per cui, nel caso peggiore:
 // T(n) = sum_{l = 1}^(log(l) + 1) (2 + l).
-// Facendo qualche conto, si ottiene una complessità O(log^2 n).
+// Facendo qualche conto, si ottiene una complessita' O(log^2 n).
 #include <string>
 #include <iostream>
 #include <vector>
@@ -46,7 +55,7 @@ int addBranch(std::vector<Fraction>& fractions, Fraction fraction) {
 void setSternBrocotRepresentation(std::string& representation, 
     std::vector<Fraction>& fractions, const Fraction& fraction, int oldPos) 
 {
-    int pos = addBranch(fractions, fraction);
+    auto pos = addBranch(fractions, fraction);
     
     if (pos == -1) {
         return;

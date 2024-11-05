@@ -1,3 +1,10 @@
+/*
+Input:
+4
+1 4 5 7
+4
+4 6 8 10
+*/
 // Chiamo v la sequenza e x l'elemento fornito.
 // int findLeftValue(vector<int>& v, int x, int pos)
 // Se v[pos] >= x, ritorna findLeftValue(v, x, pos - 1)
@@ -63,12 +70,12 @@ int main() {
     }
 
     for (auto x : xx) {
-        const auto leftValue = findLeftValue(v, x);
-        const auto leftValueString = leftValue > 0 ? std::to_string(leftValue) 
+        auto leftValue = findLeftValue(v, x);
+        auto leftValueString = leftValue > 0 ? std::to_string(leftValue) 
             : "X";
             
-        const auto rightValue = findRightValue(v, x);
-        const auto rightValueString = rightValue > 0 ? 
+        auto rightValue = findRightValue(v, x);
+        auto rightValueString = rightValue > 0 ? 
             std::to_string(rightValue) : "X";
         
         std::cout << leftValueString << " " << rightValueString << "\n";

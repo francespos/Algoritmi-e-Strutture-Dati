@@ -3,7 +3,7 @@
 // [1, 1, 0, 1] 
 // [0, 1, 0, 0]
 // [1, 1, 1, 1]
-// Una cella è percorribile se vale 1, non percorribile se vale 0.
+// Una cella e' percorribile se vale 1, non percorribile se vale 0.
 // Trovare un percorso dalla posizione (0, 0) alla posizione (3, 3) e stampare
 // la sequenza di posizioni che lo compone.
 #include <vector>
@@ -11,16 +11,16 @@
 #include <iostream>
 
 class Matrix {
+private:
+    std::vector<int> m_entries;
+    int m_numCols;
 public:
     Matrix(std::initializer_list<int> entries, int numCols) 
         : m_entries{entries}, m_numCols(numCols) {}
     
-    int operator[](int i, int j) const {
+    int operator()(int i, int j) const {
         return m_entries[i *  m_numCols + j];
     }
-private:
-    std::vector<int> m_entries;
-    int m_numCols;
 };
 
 struct Point {
@@ -32,7 +32,7 @@ bool operator==(const Point& lhs, const Point& rhs) {
 }
 
 Point operator+(const Point& lhs, const Point& rhs) {
-    return Point(lhs.x + rhs.x, lhs.y + rhs.y);
+    return Point{lhs.x + rhs.x, lhs.y + rhs.y};
 }
 
 std::ostream& operator<<(std::ostream& out, const Point& point) {
@@ -40,11 +40,11 @@ std::ostream& operator<<(std::ostream& out, const Point& point) {
 }
 
 bool isASolution(const Point& pos) {
-    return pos == Point(3, 3);
+    return pos == Point{3, 3};
 }
 
 bool isWalkable(const Matrix& grid, const Point& pos) {
-    return grid[pos.x, pos.y] == 1;
+    return grid(pos.x, pos.y) == 1;
 }
 
 void pushBackIfWalkable(std::vector<Point>& candidates, const Matrix& grid, 
@@ -59,12 +59,12 @@ std::vector<Point> getCandidates(const Matrix& grid, const Point& pos) {
     std::vector<Point> candidates{};
     
     if (pos.x < 3 && pos.y == 3) {
-        pushBackIfWalkable(candidates, grid, pos + Point(1, 0));
+        pushBackIfWalkable(candidates, grid, pos + Point{1, 0});
     } else if (pos.x == 3 && pos.y < 3) {
-        pushBackIfWalkable(candidates, grid, pos + Point(0, 1));
+        pushBackIfWalkable(candidates, grid, pos + Point{0, 1});
     } else {
-        pushBackIfWalkable(candidates, grid, pos + Point(0, 1));
-        pushBackIfWalkable(candidates, grid, pos + Point(1, 0));
+        pushBackIfWalkable(candidates, grid, pos + Point{0, 1});
+        pushBackIfWalkable(candidates, grid, pos + Point{1, 0});
     }
     
     return candidates;
@@ -93,7 +93,7 @@ void backtrack(const Matrix& grid, const Point& pos,
 }
 
 void printSolution(const Matrix& grid) {
-    Point pos(0, 0);
+    Point pos{0, 0};
     std::vector<Point> positions{pos};
     backtrack(grid, pos, positions);
 }

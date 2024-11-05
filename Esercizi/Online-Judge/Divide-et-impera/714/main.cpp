@@ -1,4 +1,14 @@
-// Mi trovo (almeno con i casi di test forniti).
+/*
+Input: 
+2
+9 3
+100 200 300 400 500 600 700 800 900
+5 4
+100 100 100 100 100
+Output:
+100 200 300 400 500 / 600 700 / 800 900
+100 / 100 / 100 / 100 100
+*/
 // Per quanto riguarda il calcolo della complessita', osserviamo che ciascuna 
 // delle n iterazioni ha complessità nel caso peggiore pari a doppio della
 // dimensione della sequenza al momento dell'iterazione (perche' sia 
@@ -31,11 +41,11 @@ Indices findMaxSumPartitionIndices(const std::vector<int>& v,
     int max;
 
     auto p = indicesSeq[0];
-    const auto q = indicesSeq[1];
+    auto q = indicesSeq[1];
     auto r = indicesSeq[2];
     
-    const auto leftSum = getSum(v, p, q);
-    const auto rightSum = getSum(v, q + 1, r);
+    auto leftSum = getSum(v, p, q);
+    auto rightSum = getSum(v, q + 1, r);
     
     if (leftSum < rightSum) {
         indices.p = q + 1;
@@ -52,7 +62,7 @@ Indices findMaxSumPartitionIndices(const std::vector<int>& v,
         p = indicesSeq[i];
         r = indicesSeq[i + 1];
         
-        const auto sum = getSum(v, p, r);
+        auto sum = getSum(v, p, r);
         
         if (sum > max) {
             indices.p = p;

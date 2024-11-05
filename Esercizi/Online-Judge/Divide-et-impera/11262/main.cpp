@@ -69,8 +69,8 @@ int getMaxLength() {
     auto minInt = getMinInt();
     auto maxInt = getMaxInt();
     
-    Point p1(minInt, minInt);
-    Point p2(maxInt, maxInt);
+    Point p1{minInt, minInt};
+    Point p2{maxInt, maxInt};
     
     return p1.getDistance(p2);
 }
@@ -99,7 +99,7 @@ BlueRedIndices findMinLengthIndices(const std::vector<Point>& blues,
         return minIndices;
     }
     
-    BlueRedIndices indices(bluePos, redPos);
+    BlueRedIndices indices{bluePos, redPos};
     
     Fence fence(blues, reds, indices);
     Fence minFence(blues, reds, minIndices);
@@ -126,7 +126,7 @@ int findMinLength(std::vector<Point>& blues, std::vector<Point>& reds, int k,
     }
     
     auto minIndices = findMinLengthIndices(blues, reds, 0, 0, 
-        BlueRedIndices(0, 0));
+        BlueRedIndices{0, 0});
         
     Fence minFence(blues, reds, minIndices);
     minLength = minFence.getLength();
@@ -144,7 +144,7 @@ int findMinLength(const std::vector<Point>& blues,
         return -1;
     }
     
-    Fence minFence(blues, reds, BlueRedIndices(0, 0));
+    Fence minFence(blues, reds, BlueRedIndices{0, 0});
     auto minLength = getMaxLength();
 
     std::vector<Point> bluesCopy(blues);

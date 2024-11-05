@@ -1,3 +1,30 @@
+/*
+Input:
+5
+20
+1
+2
+3
+6
+8
+12
+13
+13
+15
+16
+17
+18
+19
+20
+20
+21
+25
+26
+30
+31
+Output:
+6 16 20
+*/
 // La complessita' e' O(n * m), dove n e' il numero di anni ed m e' la lunghezza
 // della massima sequenza di anni di durata specificata.
 #include <vector>
@@ -25,8 +52,8 @@ Indices findMaxIndices(const std::vector<int>& years,
     const Indices& oldMaxIndices, int duration, int pos) 
 {
     if (pos < years.size()) {
-        const auto firstYearIndex = pos;
-        const auto lastYearIndex = 
+        auto firstYearIndex = pos;
+        auto lastYearIndex = 
             getLastYearIndex(years, firstYearIndex, duration);
         
         // Non semplifico gli 1 per far capire cosa sto facendo
@@ -44,7 +71,7 @@ Indices findMaxIndices(const std::vector<int>& years,
 } 
 
 Indices findMaxIndices(const std::vector<int>& years, int duration) {
-    return findMaxIndices(years, {0, getLastYearIndex(years, 0, duration)}, 
+    return findMaxIndices(years, Indices{0, getLastYearIndex(years, 0, duration)}, 
         duration, 1);
 }
 

@@ -1,9 +1,20 @@
+/*
+Input 
+2 
+4 
+1 3 5 9 
+6 
+3 6 12 15 18 21 
+Sample Output 
+7 
+9 
+*/
 #include <iostream>
 #include <vector>
 
 int findSequenceConstant(const std::vector<int>& v) {
-    const auto diff1 = v[1] - v[0];
-    const auto diff2 = v[2] - v[1];
+    auto diff1 = v[1] - v[0];
+    auto diff2 = v[2] - v[1];
     
     if (diff1 <= diff2) {
         return diff1;
@@ -25,10 +36,10 @@ int findMissingItem(const std::vector<int>& v, int p, int r, int k) {
         return v[p] + k;
     }
     
-    const int q = (p + r) / 2;
+    int q = (p + r) / 2;
     
-    const auto missingLeft = findMissingItem(v, p, q, k);
-    const auto missingRight = findMissingItem(v, q + 1, r, k);
+    auto missingLeft = findMissingItem(v, p, q, k);
+    auto missingRight = findMissingItem(v, q + 1, r, k);
     
     if (missingLeft == -1 && missingRight == -1) {
         return v[q] + k;
@@ -53,7 +64,7 @@ int main() {
             std::cin >> v[j];
         }
         
-        const auto k = findSequenceConstant(v); 
+        auto k = findSequenceConstant(v); 
         missingItems[i] = findMissingItem(v, 0, v.size() - 1, k);
     }
 

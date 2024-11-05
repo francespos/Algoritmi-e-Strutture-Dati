@@ -1,10 +1,19 @@
+/*
+Input:
+2
+2 2 4
+3 2 4 6
+Output:
+2
+4
+*/
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 
 int findMedian(std::vector<int>& v) {
-    const auto n = v.size();
+    auto n = v.size();
     std::sort(v.begin(), v.begin() + n);
     
     if (n % 2 == 1) {
@@ -15,7 +24,7 @@ int findMedian(std::vector<int>& v) {
 }
 
 int findMinSumOfDistances(std::vector<int>& v) {
-    const auto median = findMedian(v);
+    auto median = findMedian(v);
     int sum = 0;
     
     for (auto elem : v) {

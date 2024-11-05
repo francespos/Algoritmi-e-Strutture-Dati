@@ -1,3 +1,14 @@
+/*
+Input:
+1
+2 4
+0 100
+0 300
+0 600
+150 750
+Output:
+212.13
+*/
 // La complessita' nel caso peggiore e' (n-1)(n-2)*...* 2 * k, cioe' 
 // O(k * n!)
 #include <cmath>
@@ -5,12 +16,13 @@
 #include <vector>
 #include <climits>
 #include <algorithm>
+#include <iomanip>
 
 struct Point {
     float x, y;
 };
 
-constexpr float getSquare(float x) {
+float getSquare(float x) {
     return x * x;
 }
 
@@ -18,7 +30,7 @@ float getDistance(const Point& lhs, const Point& rhs) {
     return std::sqrt(getSquare(lhs.x - rhs.x) + getSquare(lhs.y - rhs.y));
 }
 
-struct Outpost final : public Point { 
+struct Outpost : public Point { 
     bool hasASatellite;
 };
 
@@ -144,6 +156,7 @@ int main() {
     }
     
     for (int i = 0; i < numTestCases; ++i) {
-        std::cout << distances[i] << "\n"; 
+        std::cout << std::fixed << std::setprecision(2) 
+            << distances[i] << "\n"; 
     }
 }
