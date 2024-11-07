@@ -1,13 +1,15 @@
 /*
-Input 
+Input:
 2 
 4 
 1 3 5 9 
 6 
 3 6 12 15 18 21 
-Sample Output 
+Output:
 7 
 9 
+Complessita':
+O(log n)
 */
 #include <iostream>
 #include <vector>

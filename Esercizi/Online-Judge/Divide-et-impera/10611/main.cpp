@@ -4,18 +4,23 @@ Input:
 1 4 5 7
 4
 4 6 8 10
+Output:
+1 5
+5 7
+7 X
+7 X
+Chiamo v la sequenza e x l'elemento fornito.
+int findLeftValue(vector<int>& v, int x, int pos)
+Se v[pos] >= x, ritorna findLeftValue(v, x, pos - 1)
+Se v[pos] < x, ritorna v[pos]
+Se non esiste l'elemento cercato (pos < 0), ritorna -1 (fallimento)
+int findRightValue(vector<int>& v, int x, int pos)
+Se v[pos] <= x, ritorna findRightValue(v, x, pos + 1)
+se v[pos] > x, ritorna v[pos]
+Se non esiste l'elemento cercato (pos >= v.size()), ritorna -1 (fallimento)
+Il caso peggiore e' quello di fallimento, e richiede lo scorrimento di tutta 
+la sequenza. Quindi, la complessita' e' O(n).
 */
-// Chiamo v la sequenza e x l'elemento fornito.
-// int findLeftValue(vector<int>& v, int x, int pos)
-// Se v[pos] >= x, ritorna findLeftValue(v, x, pos - 1)
-// Se v[pos] < x, ritorna v[pos]
-// Se non esiste l'elemento cercato (pos < 0), ritorna -1 (fallimento)
-// int findRightValue(vector<int>& v, int x, int pos)
-// Se v[pos] <= x, ritorna findRightValue(v, x, pos + 1)
-// se v[pos] > x, ritorna v[pos]
-// Se non esiste l'elemento cercato (pos >= v.size()), ritorna -1 (fallimento)
-// Il caso peggiore e' quello di fallimento, e richiede lo scorrimento di tutta 
-// la sequenza. Quindi, la complessita' e' O(n).
 #include <vector>
 #include <iostream>
 #include <string>

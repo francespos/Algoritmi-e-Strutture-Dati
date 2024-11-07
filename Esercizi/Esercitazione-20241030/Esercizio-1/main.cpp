@@ -5,7 +5,9 @@
 // [1, 1, 1, 1]
 // Una cella e' percorribile se vale 1, non percorribile se vale 0.
 // Trovare un percorso dalla posizione (0, 0) alla posizione (3, 3) e stampare
-// la sequenza di posizioni che lo compone.
+// la sequenza di posizioni che lo compone, supposto che ci si possa muovere
+// solo verso destra e verso il basso.
+// Complessita': O(2^n^2), dove n e' il numero di righe/colonne del labirinto.
 #include <vector>
 #include <initializer_list>
 #include <iostream>

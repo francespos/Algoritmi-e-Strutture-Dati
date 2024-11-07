@@ -24,72 +24,81 @@ Input:
 31
 Output:
 6 16 20
+Complessita':
+O(n^2).
 */
-// La complessita' e' O(n * m), dove n e' il numero di anni ed m e' la lunghezza
-// della massima sequenza di anni di durata specificata.
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 struct Indices {
-    int p, r;
+    int p, r;    
+    
+    int getSize() const {
+        return r - p + 1;
+    }
 };
 
-int getLastYearIndex(const std::vector<int>& years, int firstYearIndex, 
-    int duration)
-{
-    auto yearIndex = firstYearIndex;
-    
-    while (yearIndex < years.size() &&
-        years[yearIndex] < years[firstYearIndex] + duration) 
+void setIndices(Indices& indices, const std::vector<int>& years, int duration) {
+    if (indices.r < years.size() && 
+        years[indices.r] - years[indices.p] + 1 <= duration) 
     {
-        ++yearIndex;
+        indices.r += 1;
+        setIndices(indices, years, duration);
     }
     
-    return yearIndex - 1;
+    if ((indices.r < years.size() && 
+        years[indices.r] - years[indices.p] + 1 > duration) || 
+        indices.r == years.size())
+    {
+        indices.r -= 1;
+    }
 }
 
-Indices findMaxIndices(const std::vector<int>& years, 
-    const Indices& oldMaxIndices, int duration, int pos) 
+void setMaxSizeIndices(Indices& indices, Indices& maxSizeIndices, 
+    const std::vector<int>& years, int duration)
 {
-    if (pos < years.size()) {
-        auto firstYearIndex = pos;
-        auto lastYearIndex = 
-            getLastYearIndex(years, firstYearIndex, duration);
-        
-        // Non semplifico gli 1 per far capire cosa sto facendo
-        if (lastYearIndex - firstYearIndex + 1 > 
-            oldMaxIndices.r - oldMaxIndices.p + 1) 
-        {
-            Indices indices = {firstYearIndex, lastYearIndex};
-            return findMaxIndices(years, indices, duration, pos + 1);
-        }
-        
-        return findMaxIndices(years, oldMaxIndices, duration, pos + 1);
+    if (indices.p == years.size()) {
+        return;
     }
     
-    return oldMaxIndices;
-} 
+    setIndices(indices, years, duration);
+    
+    if (indices.getSize() > maxSizeIndices.getSize()) {
+        maxSizeIndices = indices;
+    }
+    
+    indices.p +=  1;
+    indices.r = indices.p;
+    
+    setMaxSizeIndices(indices, maxSizeIndices, years, duration);
+}
 
-Indices findMaxIndices(const std::vector<int>& years, int duration) {
-    return findMaxIndices(years, Indices{0, getLastYearIndex(years, 0, duration)}, 
-        duration, 1);
+Indices getMaxSizeIndices(const std::vector<int>& years, int duration) {
+    Indices indices{0, 0};
+    Indices maxSizeIndices{0, 0};
+    
+    setMaxSizeIndices(indices, maxSizeIndices, years, duration);
+    return maxSizeIndices;
 }
 
 int main() {
     int duration;
-    std::cin >> duration;
     
-    int numYears;
-    std::cin >> numYears;
-    
-    std::vector<int> years(numYears);
-    
-    for (int i =  0; i < numYears; ++i) {
-        std::cin >> years[i];
+    while (std::cin >> duration) {  
+        int numYears;
+        std::cin >> numYears;
+        
+        std::vector<int> years(numYears);
+        
+        for (auto& year : years) {
+            std::cin >> year;
+        }
+
+        auto indices = getMaxSizeIndices(years, duration);
+
+        std::cout << indices.getSize() << " "
+            << years[indices.p] << " " 
+            << years[indices.r] << "\n";
     }
-    
-    const auto maxIndices = findMaxIndices(years, duration);
-    
-    std::cout << maxIndices.r - maxIndices.p + 1 << " " << years[maxIndices.p]
-        << " " << years[maxIndices.r] << "\n";
 }

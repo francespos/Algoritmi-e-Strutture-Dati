@@ -8,6 +8,8 @@ Output:
 2 
 10 
 92 
+Complessita':
+O(n!)
 */
 
 #include <vector>

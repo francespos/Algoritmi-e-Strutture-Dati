@@ -6,11 +6,10 @@ Input:
 Output:
 LRRL
 RRLRRLRLLLLRLRRR
+Complessita': la complessita', supposta costante la 
+compelssita' ammortizzata dell'append di std::string
+e' O(log n)
 */
-// Bisogna attraversare un nodo per livello, e nel livello l-esimo si fa un 
-// inserimento in un vettore di dimensione 2 + l per cui, nel caso peggiore:
-// T(n) = sum_{l = 1}^(log(l) + 1) (2 + l).
-// Facendo qualche conto, si ottiene una complessita' O(log^2 n).
 #include <string>
 #include <iostream>
 #include <vector>
@@ -20,66 +19,45 @@ struct Fraction {
 };
 
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
-    return {lhs.n + rhs.n, lhs.d + rhs.d};
+    return Fraction{lhs.n + rhs.n, lhs.d + rhs.d};
 }
 
 bool operator==(const Fraction& lhs, const Fraction& rhs) {
     return lhs.n == rhs.n && lhs.d == rhs.d;
 }
 
-bool operator>(const Fraction& lhs, const Fraction& rhs) {
-    if (rhs.d == 0) {
-        return false;
-    }
-    
-    return static_cast<float>(lhs.n) / lhs.d > 
-        static_cast<float>(rhs.n) / rhs.d;
+bool operator<(const Fraction& lhs, const Fraction& rhs) {
+    return lhs.n * rhs.d - rhs.n * lhs.d < 0;
 }
 
-int addBranch(std::vector<Fraction>& fractions, Fraction fraction) {
-    int i = 0;
-    
-    while (fraction > fractions[i]) {
-        ++i;
-    }
-    
-    if (fraction == fractions[i]) {
-        return -1;
-    }
-    
-    fractions.insert(fractions.begin() + i, fractions[i - 1] + fractions[i]);
-    
-    return i;
-}
-
-void setSternBrocotRepresentation(std::string& representation, 
-    std::vector<Fraction>& fractions, const Fraction& fraction, int oldPos) 
+void setRepresentation(std::string& representation,
+    const Fraction& left, const Fraction& target, const Fraction& right) 
 {
-    auto pos = addBranch(fractions, fraction);
+    auto mid = left + right;
     
-    if (pos == -1) {
+    if (target == mid) {
         return;
     }
     
-    if (pos <= oldPos) {
+    if (target < mid) {
         representation.append("L");
+        setRepresentation(representation, left, target, mid);
     } else {
         representation.append("R");
+        setRepresentation(representation, mid, target, right);
     }
-    
-    setSternBrocotRepresentation(representation, fractions, fraction, pos);
 }
 
-std::string getSternBrocotRepresentation(std::vector<Fraction>& fractions, 
-    const Fraction& fraction)
-{
+std::string getRepresentation(const Fraction& target) {
     std::string representation("");
-    setSternBrocotRepresentation(representation, fractions, fraction, 1);
+    
+    setRepresentation(representation, 
+        Fraction{0, 1}, target, Fraction{1, 0});
+        
     return representation;
 }
 
 int main() {
-    std::vector<Fraction> fractions{{0, 1}, {1, 1}, {1, 0}};
     std::vector<std::string> representations;
     
     while (true) {
@@ -93,8 +71,7 @@ int main() {
             break;
         }
         
-        representations.push_back(getSternBrocotRepresentation(fractions, 
-            {n, d}));
+        representations.push_back(getRepresentation(Fraction{n, d}));
     }
 
     for (const auto& representation : representations) {
