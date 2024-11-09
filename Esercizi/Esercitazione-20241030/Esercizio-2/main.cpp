@@ -21,7 +21,7 @@ Spiral 5 5
 Output:
 Feldberg: 7
 Spiral: 25
-Complessita': O(n * m * 4 ^ (n * m)
+Complessita': O(n * m * 4 ^ (n * m))
 */
 #include <vector>
 #include <initializer_list>

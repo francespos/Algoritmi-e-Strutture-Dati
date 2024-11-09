@@ -6,6 +6,7 @@ Input:
 Output:
 2
 4
+Complessita': O(nlogn)
 */
 #include <vector>
 #include <iostream>

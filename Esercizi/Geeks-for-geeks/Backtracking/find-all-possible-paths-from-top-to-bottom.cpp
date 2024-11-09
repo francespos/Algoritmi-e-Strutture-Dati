@@ -10,22 +10,14 @@ using namespace std;
 
 class Matrix {
 private:
-    std::vector<int> m_entries;
+    int m_numRows;
     int m_numCols;
 public:
-    Matrix(int numRows, int numCols) : m_entries(numRows * numCols, 0), 
-        m_numCols(numCols) {}
-    
-    int operator()(int i, int j) const {
-        return m_entries[i *  m_numCols + j];
-    }
-    
-    int& operator()(int i, int j) {
-        return m_entries[i *  m_numCols + j];
-    }
+    Matrix(int numRows, int numCols) 
+        : m_numRows(numRows), m_numCols(numCols) {}
     
     int getNumRows() const {
-        return m_entries.size() / m_numCols;
+        return m_numRows;
     }
     
     int getNumCols() const {
@@ -52,18 +44,6 @@ bool isASolution(const Matrix& grid, const Point& pos) {
     return pos == Point{m, n};
 }
 
-bool isWalkable(const Matrix& grid, const Point& pos) {
-    return grid(pos.x, pos.y) == 0;
-}
-
-void pushBackIfWalkable(std::vector<Point>& candidates, const Matrix& grid, 
-    const Point& pos)
-{
-    if (isWalkable(grid, pos)) {
-        candidates.push_back(pos);
-    }
-}
-
 std::vector<Point> getCandidates(const Matrix& grid, const Point& pos) {
     std::vector<Point> candidates{};
     
@@ -71,12 +51,12 @@ std::vector<Point> getCandidates(const Matrix& grid, const Point& pos) {
     auto n = grid.getNumCols() - 1;
     
     if (pos.x < m && pos.y == n) {
-        pushBackIfWalkable(candidates, grid, pos + Point{1, 0});
+        candidates.push_back(pos + Point{1, 0});
     } else if (pos.x == m && pos.y < n) {
-        pushBackIfWalkable(candidates, grid, pos + Point{0, 1});
+        candidates.push_back(pos + Point{0, 1});
     } else {
-        pushBackIfWalkable(candidates, grid, pos + Point{1, 0}); // Prima movimento giù
-        pushBackIfWalkable(candidates, grid, pos + Point{0, 1}); // Poi movimento destra
+        candidates.push_back(pos + Point{1, 0});
+        candidates.push_back(pos + Point{0, 1});
     }
     
     return candidates;
