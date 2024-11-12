@@ -1,4 +1,17 @@
-// Complessita': O(2^n)
+/*
+Input:
+1
+4 2
+
+Output:
+0011
+0101
+0110
+1001
+1010
+1100
+Complessita': O(2^n)
+*/
 #include <vector>
 #include <iostream>
 

@@ -9,52 +9,31 @@ Output:
 5 7
 7 X
 7 X
-Chiamo v la sequenza e x l'elemento fornito.
-int findLeftValue(vector<int>& v, int x, int pos)
-Se v[pos] >= x, ritorna findLeftValue(v, x, pos - 1)
-Se v[pos] < x, ritorna v[pos]
-Se non esiste l'elemento cercato (pos < 0), ritorna -1 (fallimento)
-int findRightValue(vector<int>& v, int x, int pos)
-Se v[pos] <= x, ritorna findRightValue(v, x, pos + 1)
-se v[pos] > x, ritorna v[pos]
-Se non esiste l'elemento cercato (pos >= v.size()), ritorna -1 (fallimento)
-Il caso peggiore e' quello di fallimento, e richiede lo scorrimento di tutta 
-la sequenza. Quindi, la complessita' e' O(n).
+Complessita': O(n)
+Osserviamo che essendo la sequenza non descrescente non e' possibile applicare
+la ricerca binaria.
 */
 #include <vector>
 #include <iostream>
 #include <string>
+#include <utility>
 
-int findLeftValue(const std::vector<int>& v, int x, int pos) {
-    if (pos < -0) {
-        return -1;
+std::pair<int, int> getValues(const std::vector<int>& v, int x) {
+    int left = -1;
+    int right = -1;
+    
+    bool rightFound = false;
+    
+    for (int i = 0; i < v.size(); ++i) {
+        if (x > v[i]) {
+            left = v[i];
+        } else if (!rightFound && x < v[i]) {
+            right = v[i];
+            rightFound = true;
+        }
     }
     
-    if (v[pos] >= x) {
-        return findLeftValue(v, x, pos - 1);
-    } else {
-        return v[pos];
-    }
-}
-
-int findLeftValue(const std::vector<int>& v, int x) {
-    return findLeftValue(v, x, v.size() - 1);
-}
-
-int findRightValue(const std::vector<int>& v, int x, int pos) {
-    if (pos >= v.size()) {
-        return -1;
-    }
-    
-    if (v[pos] <= x) {
-        return findRightValue(v, x, pos + 1);
-    } else {
-        return v[pos];
-    }
-}
-
-int findRightValue(const std::vector<int>& v, int x) {
-    return findRightValue(v, x, 0);
+    return std::pair<int, int>(left, right);
 }
 
 int main() {
@@ -75,14 +54,16 @@ int main() {
     }
 
     for (auto x : xx) {
-        auto leftValue = findLeftValue(v, x);
-        auto leftValueString = leftValue > 0 ? std::to_string(leftValue) 
-            : "X";
-            
-        auto rightValue = findRightValue(v, x);
-        auto rightValueString = rightValue > 0 ? 
-            std::to_string(rightValue) : "X";
+        auto values = getValues(v, x);
         
-        std::cout << leftValueString << " " << rightValueString << "\n";
+        auto print = [](int value) {
+            std::cout << (value < 0 ? "X" : std::to_string(value));  
+        };
+        
+        print(values.first);
+        std::cout << " ";
+        
+        print(values.second);
+        std::cout << "\n";
     }
 }
